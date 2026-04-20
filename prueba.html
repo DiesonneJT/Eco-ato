@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecoñato — ODS 12</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{--g1:#1b4332;--g2:#2d6a4f;--g3:#40916c;--g4:#52b788;--g5:#95d5b2;--g6:#d8f3dc;--acc:#f77f00;--white:#fff;--gray:#f4f4f4;--dark:#111;--text:#333;--sidebar:220px;--radius:12px;--shadow:0 4px 20px rgba(0,0,0,.10);}
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+  body{background:var(--gray);color:var(--text);min-height:100vh;}
+
+  /* ===== PAGES ===== */
+  .page{display:none;min-height:100vh;}
+  .page.active{display:block;}
+
+  /* ===== NAVBAR LANDING ===== */
+  nav.top{background:var(--g1);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+  nav.top .logo{color:var(--white);font-size:1.5rem;font-weight:800;letter-spacing:1px;display:flex;align-items:center;gap:8px;}
+  nav.top .logo span{color:var(--g5);}
+  nav.top .nav-links a{color:var(--g5);text-decoration:none;margin-left:24px;font-size:.95rem;transition:.2s;}
+  nav.top .nav-links a:hover{color:var(--white);}
+  nav.top .nav-btns{display:flex;gap:10px;}
+
+  /* ===== BUTTONS ===== */
+  .btn{padding:9px 22px;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:.2s;}
+  .btn-outline{background:transparent;border:2px solid var(--g4);color:var(--g4);}
+  .btn-outline:hover{background:var(--g4);color:var(--white);}
+  .btn-primary{background:var(--g3);color:var(--white);}
+  .btn-primary:hover{background:var(--g2);}
+  .btn-acc{background:var(--acc);color:var(--white);}
+  .btn-acc:hover{filter:brightness(1.1);}
+  .btn-danger{background:#e63946;color:#fff;}
+  .btn-danger:hover{filter:brightness(1.1);}
+  .btn-sm{padding:6px 14px;font-size:.82rem;}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,var(--g1) 0%,var(--g2) 60%,var(--g3) 100%);color:var(--white);padding:90px 40px 80px;text-align:center;}
+  .hero h1{font-size:3rem;font-weight:900;margin-bottom:16px;line-height:1.2;}
+  .hero h1 span{color:var(--g5);}
+  .hero p{font-size:1.15rem;max-width:600px;margin:0 auto 36px;opacity:.9;line-height:1.7;}
+  .hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .badge-ods{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:50px;padding:6px 18px;font-size:.85rem;margin-bottom:24px;}
+
+  /* ===== SECTIONS ===== */
+  section{padding:70px 40px;}
+  section h2{text-align:center;font-size:2rem;color:var(--g1);margin-bottom:10px;}
+  section .sub{text-align:center;color:#666;margin-bottom:50px;font-size:1rem;}
+
+  /* ===== CARDS ===== */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:1100px;margin:0 auto;}
+  .card{background:var(--white);border-radius:var(--radius);padding:30px 24px;box-shadow:var(--shadow);transition:.3s;}
+  .card:hover{transform:translateY(-4px);}
+  .card-icon{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:16px;}
+  .card h3{font-size:1.05rem;color:var(--g1);margin-bottom:8px;}
+  .card p{font-size:.9rem;color:#666;line-height:1.6;}
+
+  /* ===== ODS SECTION ===== */
+  .ods-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1100px;margin:0 auto;}
+  .ods-item{background:var(--white);border-left:5px solid var(--g3);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow);}
+  .ods-item .meta{font-size:.8rem;color:var(--g3);font-weight:700;margin-bottom:6px;}
+  .ods-item h4{color:var(--g1);margin-bottom:6px;}
+  .ods-item p{font-size:.88rem;color:#555;line-height:1.6;}
+
+  /* ===== STATS HERO ===== */
+  .stats-hero{background:var(--g6);padding:50px 40px;}
+  .stats-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto;}
+  .stat-box{background:var(--white);border-radius:var(--radius);padding:24px 36px;text-align:center;box-shadow:var(--shadow);}
+  .stat-box .num{font-size:2.4rem;font-weight:900;color:var(--g2);}
+  .stat-box .lbl{font-size:.85rem;color:#666;}
+
+  /* ===== FOOTER ===== */
+  footer{background:var(--g1);color:var(--g5);text-align:center;padding:28px 40px;font-size:.88rem;}
+
+  /* ===== AUTH PAGES ===== */
+  .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--g1),var(--g3));}
+  .auth-box{background:var(--white);border-radius:16px;padding:42px 38px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+  .auth-box .logo-auth{text-align:center;font-size:1.6rem;font-weight:900;color:var(--g1);margin-bottom:6px;}
+  .auth-box .logo-auth span{color:var(--g4);}
+  .auth-box .subtitle{text-align:center;color:#888;font-size:.9rem;margin-bottom:28px;}
+  .form-group{margin-bottom:18px;}
+  .form-group label{display:block;font-size:.85rem;font-weight:600;color:var(--g1);margin-bottom:6px;}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.95rem;transition:.2s;outline:none;}
+  .form-group input:focus,.form-group select:focus{border-color:var(--g3);}
+  .form-group textarea{resize:vertical;min-height:80px;}
+  .auth-box .btn{width:100%;padding:12px;font-size:1rem;margin-top:6px;}
+  .auth-switch{text-align:center;margin-top:18px;font-size:.88rem;color:#888;}
+  .auth-switch a{color:var(--g3);cursor:pointer;font-weight:600;text-decoration:none;}
+  .auth-error{background:#ffe0e0;color:#c62828;padding:10px 14px;border-radius:8px;font-size:.88rem;margin-bottom:14px;display:none;}
+
+  /* ===== DASHBOARD LAYOUT ===== */
+  .app-layout{display:flex;min-height:100vh;}
+  .sidebar{width:var(--sidebar);background:var(--g1);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:200;}
+  .sidebar .s-logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.1);font-size:1.2rem;font-weight:800;color:var(--white);display:flex;align-items:center;gap:8px;}
+  .sidebar .s-logo span{color:var(--g5);}
+  .sidebar nav{flex:1;padding:16px 0;}
+  .sidebar nav a{display:flex;align-items:center;gap:12px;padding:13px 22px;color:var(--g5);text-decoration:none;font-size:.92rem;transition:.2s;cursor:pointer;}
+  .sidebar nav a:hover,.sidebar nav a.active{background:rgba(255,255,255,.12);color:var(--white);}
+  .sidebar nav a i{width:20px;text-align:center;}
+  .sidebar .s-user{padding:18px 20px;border-top:1px solid rgba(255,255,255,.1);color:var(--g5);font-size:.85rem;}
+  .sidebar .s-user strong{display:block;color:var(--white);margin-bottom:2px;}
+  .main-content{margin-left:var(--sidebar);flex:1;padding:30px;background:var(--gray);}
+  .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+  .top-bar h1{font-size:1.6rem;color:var(--g1);font-weight:800;}
+  .top-bar .actions{display:flex;gap:10px;}
+
+  /* ===== DASHBOARD WIDGETS ===== */
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:28px;}
+  .kpi{background:var(--white);border-radius:var(--radius);padding:22px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:16px;}
+  .kpi-icon{width:50px;height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .kpi-info .num{font-size:1.8rem;font-weight:900;line-height:1;}
+  .kpi-info .lbl{font-size:.8rem;color:#888;margin-top:3px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+  .widget{background:var(--white);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
+  .widget h3{font-size:1rem;color:var(--g1);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .widget h3 i{color:var(--g3);}
+
+  /* ===== TABLE ===== */
+  .tbl-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:.88rem;}
+  th{background:var(--g6);color:var(--g1);padding:10px 14px;text-align:left;font-weight:700;}
+  td{padding:10px 14px;border-bottom:1px solid #eee;vertical-align:middle;}
+  tr:hover td{background:#f9fffe;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.75rem;font-weight:700;}
+  .badge-green{background:#d8f3dc;color:#1b4332;}
+  .badge-yellow{background:#fff3cd;color:#856404;}
+  .badge-blue{background:#cfe2ff;color:#084298;}
+  .badge-red{background:#f8d7da;color:#842029;}
+
+  /* ===== INVENTORY ===== */
+  .inv-controls{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+  .search-box{flex:1;min-width:200px;padding:9px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;outline:none;}
+  .search-box:focus{border-color:var(--g3);}
+
+  /* ===== MODAL ===== */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--white);border-radius:16px;padding:32px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+  .modal h2{color:var(--g1);margin-bottom:20px;font-size:1.2rem;}
+  .modal .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+
+  /* ===== EDUCATION ===== */
+  .edu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+  .edu-card{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+  .edu-card .edu-img{height:8px;}
+  .edu-card .edu-body{padding:20px;}
+  .edu-card h4{color:var(--g1);margin-bottom:8px;}
+  .edu-card p{font-size:.88rem;color:#666;line-height:1.6;}
+  .edu-card .edu-tag{font-size:.75rem;font-weight:700;color:var(--g3);margin-bottom:6px;}
+
+  /* ===== REPORTS ===== */
+  .report-card{background:var(--white);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .report-info h4{color:var(--g1);margin-bottom:4px;}
+  .report-info p{font-size:.85rem;color:#888;}
+
+  /* ===== CERT ===== */
+  .cert-preview{background:linear-gradient(135deg,var(--g1),var(--g2));color:var(--white);border-radius:var(--radius);padding:28px;text-align:center;margin-top:16px;}
+  .cert-preview h3{font-size:1.1rem;margin-bottom:8px;}
+  .cert-preview p{font-size:.88rem;opacity:.85;}
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:768px){
+    .sidebar{transform:translateX(-100%);transition:.3s;}
+    .sidebar.open{transform:translateX(0);}
+    .main-content{margin-left:0;}
+    .grid-2{grid-template-columns:1fr;}
+    .hero h1{font-size:2rem;}
+    nav.top .nav-links{display:none;}
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar{width:6px;}
+  ::-webkit-scrollbar-track{background:#f1f1f1;}
+  ::-webkit-scrollbar-thumb{background:var(--g4);border-radius:3px;}
+
+  .progress-bar{background:#e0e0e0;border-radius:50px;height:8px;overflow:hidden;margin-top:6px;}
+  .progress-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--g3),var(--g5));transition:width .8s ease;}
+
+  .notification{position:fixed;top:20px;right:20px;background:var(--g2);color:#fff;padding:14px 20px;border-radius:10px;box-shadow:var(--shadow);z-index:999;font-size:.9rem;transform:translateX(120%);transition:.4s;}
+  .notification.show{transform:translateX(0);}
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notif"><i class="fa fa-check-circle"></i> <span id="notif-msg"></span></div>
+
+<!-- =================== PAGE: LANDING =================== -->
+<div class="page active" id="page-landing">
+  <nav class="top">
+    <div class="logo"><i class="fa fa-leaf"></i> Eco<span>ñato</span></div>
+    <div class="nav-links">
+      <a href="#" onclick="scrollTo(0,400)">¿Qué es?</a>
+      <a href="#" onclick="scrollTo(0,900)">ODS 12</a>
+      <a href="#" onclick="scrollTo(0,1400)">Impacto</a>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-outline" onclick="showPage('page-login')">Iniciar sesión</button>
+      <button class="btn btn-acc" onclick="showPage('page-register')">Registrarse</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="badge-ods"><i class="fa fa-recycle"></i> ODS 12 — Producción y Consumo Responsables</div>
+    <h1>Gestiona tus residuos<br>electrónicos con <span>Ecoñato</span></h1>
+    <p>La plataforma tecnológica que ayuda a las pequeñas y medianas empresas a reducir su huella electrónica, cumplir con la meta 12.5 del ODS 12 y transformar el e-waste en valor.</p>
+    <div class="hero-btns">
+      <button class="btn btn-acc" style="font-size:1rem;padding:14px 32px" onclick="showPage('page-register')"><i class="fa fa-rocket"></i> Comenzar ahora</button>
+      <button class="btn btn-outline" style="font-size:1rem;padding:14px 32px;border-color:#fff;color:#fff" onclick="showPage('page-login')">Ver demo</button>
+    </div>
+  </div>
+
+  <div class="stats-hero">
+    <div class="stats-row">
+      <div class="stat-box"><div class="num">53.6M</div><div class="lbl">Toneladas de e-waste/año</div></div>
+      <div class="stat-box"><div class="num">17.4%</div><div class="lbl">Tasa global de reciclaje</div></div>
+      <div class="stat-box"><div class="num">$57B</div><div class="lbl">Valor perdido sin reciclar</div></div>
+      <div class="stat-box"><div class="num">ODS 12</div><div class="lbl">Meta 12.5 para 2030</div></div>
+    </div>
+  </div>
+
+  <section style="background:#fff">
+    <h2>¿Qué hace Ecoñato?</h2>
+    <p class="sub">Una solución integral para la gestión responsable de residuos electrónicos</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon" style="background:#d8f3dc"><i class="fa fa-boxes-stacked" style="color:#2d6a4f"></i></div>
+        <h3>Inventario inteligente</h3>
+        <p>Registra y clasifica cada equipo electrónico: estado, materiales, opciones de disposición responsable.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:#fff3cd"><i class="fa fa-certificate" style="color:#f77f00"></i></div>
+        <h3>Certificado digital</h3>
+        <p>Genera comprobantes de "Disposición Responsable" validando el cierre sostenible del ciclo de vida.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:#cfe2ff"><i class="fa fa-chart-line" style="color:#084298"></i></div>
+        <h3>Estadísticas de impacto</h3>
+        <p>Visualiza materiales recuperados, reducción de huella ecológica y métricas de sostenibilidad.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="background:#f8d7da"><i class="fa fa-file-lines" style="color:#842029"></i></div>
+        <h3>Reportes automáticos</h3>
+        <p>Informes listos para integrar en la memoria de sostenibilidad de tu empresa.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Metas ODS 12 que cumplimos</h2>
+    <p class="sub">Ecoñato está alineado con los Objetivos de Desarrollo Sostenible de la ONU</p>
+    <div class="ods-grid">
+      <div class="ods-item">
+        <div class="meta">META 12.4</div>
+        <h4>Gestión Ecológicamente Racional</h4>
+        <p>Registro de componentes peligrosos (plomo, mercurio) para evitar su disposición incorrecta y cumplir marcos internacionales.</p>
+      </div>
+      <div class="ods-item">
+        <div class="meta">META 12.5</div>
+        <h4>Prevención y Valorización</h4>
+        <p>Sistema de clasificación que identifica equipos reparables o donables, extendiendo su vida útil y fomentando la economía circular.</p>
+      </div>
+      <div class="ods-item">
+        <div class="meta">META 12.6</div>
+        <h4>Transparencia y Reportes</h4>
+        <p>Generación automática de informes de sostenibilidad con datos de reciclaje para integrar en la información corporativa.</p>
+      </div>
+      <div class="ods-item">
+        <div class="meta">META 12.8</div>
+        <h4>Educación y Conciencia</h4>
+        <p>Contenido educativo personalizado sobre el impacto de cada dispositivo reciclado en la conservación de recursos naturales.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--g1);color:#fff;text-align:center">
+    <h2 style="color:#fff">¿Listo para reducir tu huella electrónica?</h2>
+    <p style="color:var(--g5);margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto">Únete a las empresas que ya gestionan su e-waste de forma responsable con Ecoñato.</p>
+    <button class="btn btn-acc" style="font-size:1rem;padding:14px 36px" onclick="showPage('page-register')"><i class="fa fa-leaf"></i> Crear cuenta gratis</button>
+  </section>
+
+  <footer>
+    <p>🌱 <strong>Ecoñato</strong> — Tecnología al servicio del planeta · ODS 12 · © 2025</p>
+    <p style="margin-top:6px;opacity:.7">Reduciendo e-waste, construyendo futuro sostenible.</p>
+  </footer>
+</div>
+
+<!-- =================== PAGE: LOGIN =================== -->
+<div class="page" id="page-login">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="logo-auth"><i class="fa fa-leaf" style="color:var(--g4)"></i> Eco<span>ñato</span></div>
+      <div class="subtitle">Inicia sesión en tu cuenta</div>
+      <div class="auth-error" id="login-error">Credenciales incorrectas. Intenta de nuevo.</div>
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" id="login-email" placeholder="empresa@correo.com" value="demo@econato.co">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="••••••••" value="demo1234">
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()"><i class="fa fa-right-to-bracket"></i> Iniciar sesión</button>
+      <div class="auth-switch">¿No tienes cuenta? <a onclick="showPage('page-register')">Regístrate aquí</a></div>
+      <div class="auth-switch" style="margin-top:8px"><a onclick="showPage('page-landing')"><i class="fa fa-arrow-left"></i> Volver al inicio</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== PAGE: REGISTER =================== -->
+<div class="page" id="page-register">
+  <div class="auth-wrap">
+    <div class="auth-box" style="max-width:500px">
+      <div class="logo-auth"><i class="fa fa-leaf" style="color:var(--g4)"></i> Eco<span>ñato</span></div>
+      <div class="subtitle">Crea tu cuenta empresarial</div>
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label>Nombre empresa</label><input id="reg-name" placeholder="Mi Empresa SAS"></div>
+        <div class="form-group"><label>NIT</label><input id="reg-nit" placeholder="900.123.456-7"></div>
+      </div>
+      <div class="form-group">
+        <label>Sector</label>
+        <select id="reg-sector">
+          <option>Tecnología</option><option>Manufactura</option><option>Comercio</option>
+          <option>Salud</option><option>Educación</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Correo electrónico</label><input type="email" id="reg-email" placeholder="empresa@correo.com"></div>
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label>Contraseña</label><input type="password" id="reg-pass" placeholder="••••••••"></div>
+        <div class="form-group"><label>Confirmar</label><input type="password" id="reg-pass2" placeholder="••••••••"></div>
+      </div>
+      <button class="btn btn-acc" onclick="doRegister()"><i class="fa fa-user-plus"></i> Crear cuenta</button>
+      <div class="auth-switch">¿Ya tienes cuenta? <a onclick="showPage('page-login')">Inicia sesión</a></div>
+      <div class="auth-switch" style="margin-top:8px"><a onclick="showPage('page-landing')"><i class="fa fa-arrow-left"></i> Volver al inicio</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== APP (authenticated pages) =================== -->
+<div class="page" id="page-app">
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="s-logo"><i class="fa fa-leaf"></i> Eco<span>ñato</span></div>
+      <nav>
+        <a onclick="showTab('tab-dashboard')" id="nav-dashboard" class="active"><i class="fa fa-gauge"></i> Dashboard</a>
+        <a onclick="showTab('tab-inventory')" id="nav-inventory"><i class="fa fa-boxes-stacked"></i> Inventario</a>
+        <a onclick="showTab('tab-stats')" id="nav-stats"><i class="fa fa-chart-bar"></i> Estadísticas</a>
+        <a onclick="showTab('tab-reports')" id="nav-reports"><i class="fa fa-file-lines"></i> Reportes</a>
+        <a onclick="showTab('tab-education')" id="nav-education"><i class="fa fa-graduation-cap"></i> Educación</a>
+      </nav>
+      <div class="s-user">
+        <strong id="sidebar-name">Empresa Demo</strong>
+        <span id="sidebar-email">demo@econato.co</span><br>
+        <a onclick="doLogout()" style="color:var(--g5);cursor:pointer;font-size:.82rem;margin-top:6px;display:inline-block"><i class="fa fa-right-from-bracket"></i> Cerrar sesión</a>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+
+      <!-- TAB: DASHBOARD -->
+      <div id="tab-dashboard">
+        <div class="top-bar">
+          <h1>Dashboard</h1>
+          <div class="actions">
+            <button class="btn btn-primary btn-sm" onclick="showTab('tab-inventory')"><i class="fa fa-plus"></i> Nuevo equipo</button>
+          </div>
+        </div>
+        <div class="kpi-row" id="kpi-row"></div>
+        <div class="grid-2">
+          <div class="widget">
+            <h3><i class="fa fa-chart-pie"></i> Equipos por estado</h3>
+            <canvas id="chartStatus" height="220"></canvas>
+          </div>
+          <div class="widget">
+            <h3><i class="fa fa-chart-line"></i> Equipos registrados (últimos meses)</h3>
+            <canvas id="chartTrend" height="220"></canvas>
+          </div>
+        </div>
+        <div class="widget">
+          <h3><i class="fa fa-clock-rotate-left"></i> Últimos movimientos</h3>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Equipo</th><th>Tipo</th><th>Estado</th><th>Fecha</th></tr></thead>
+              <tbody id="recent-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: INVENTORY -->
+      <div id="tab-inventory" style="display:none">
+        <div class="top-bar">
+          <h1>Gestión de Inventario</h1>
+          <div class="actions">
+            <button class="btn btn-primary btn-sm" onclick="openModal()"><i class="fa fa-plus"></i> Registrar equipo</button>
+          </div>
+        </div>
+        <div class="inv-controls">
+          <input class="search-box" id="search-inv" placeholder="🔍 Buscar por nombre, tipo..." oninput="renderInventory()">
+          <select id="filter-status" class="search-box" style="max-width:180px" onchange="renderInventory()">
+            <option value="">Todos los estados</option>
+            <option>Reciclable</option><option>Reparable</option><option>Donable</option><option>Procesado</option>
+          </select>
+        </div>
+        <div class="widget">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Equipo</th><th>Tipo</th><th>Marca</th><th>Estado</th><th>Materiales</th><th>Fecha</th><th>Acciones</th></tr></thead>
+              <tbody id="inv-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: STATS -->
+      <div id="tab-stats" style="display:none">
+        <div class="top-bar"><h1>Estadísticas</h1></div>
+        <div class="kpi-row" id="stats-kpi"></div>
+        <div class="grid-2">
+          <div class="widget">
+            <h3><i class="fa fa-circle-nodes"></i> Materiales recuperados (kg)</h3>
+            <canvas id="chartMaterials" height="240"></canvas>
+          </div>
+          <div class="widget">
+            <h3><i class="fa fa-arrows-spin"></i> Economía circular</h3>
+            <canvas id="chartCircular" height="240"></canvas>
+          </div>
+        </div>
+        <div class="widget" style="margin-top:20px">
+          <h3><i class="fa fa-leaf"></i> Reducción de huella ecológica</h3>
+          <div id="huella-bars"></div>
+        </div>
+      </div>
+
+      <!-- TAB: REPORTS -->
+      <div id="tab-reports" style="display:none">
+        <div class="top-bar"><h1>Reportes de Sostenibilidad</h1></div>
+        <div class="report-card">
+          <div class="report-info">
+            <h4><i class="fa fa-file-pdf" style="color:#e63946"></i> Informe Mensual de Reciclaje</h4>
+            <p>Resumen de equipos gestionados, materiales recuperados y huella reducida este mes.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="genReport('mensual')"><i class="fa fa-download"></i> Generar</button>
+        </div>
+        <div class="report-card">
+          <div class="report-info">
+            <h4><i class="fa fa-certificate" style="color:var(--acc)"></i> Certificados de Disposición Responsable</h4>
+            <p>Comprobantes individuales por equipo ingresado al sistema.</p>
+          </div>
+          <button class="btn btn-acc btn-sm" onclick="genReport('cert')"><i class="fa fa-download"></i> Generar</button>
+        </div>
+        <div class="report-card">
+          <div class="report-info">
+            <h4><i class="fa fa-chart-bar" style="color:var(--g3)"></i> Reporte Anual ODS 12</h4>
+            <p>Informe completo de cumplimiento de metas 12.4, 12.5, 12.6 y 12.8.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="genReport('anual')"><i class="fa fa-download"></i> Generar</button>
+        </div>
+        <div id="report-output"></div>
+      </div>
+
+      <!-- TAB: EDUCATION -->
+      <div id="tab-education" style="display:none">
+        <div class="top-bar"><h1>Centro Educativo</h1></div>
+        <div class="edu-grid">
+          <div class="edu-card">
+            <div class="edu-img" style="background:var(--g3)"></div>
+            <div class="edu-body">
+              <div class="edu-tag">META 12.5 · ECONOMÍA CIRCULAR</div>
+              <h4>¿Por qué reciclar tu laptop importa?</h4>
+              <p>Una laptop contiene oro, plata, cobre y paladio. Recuperar estos materiales consume 95% menos energía que extraerlos de la tierra. ♻️</p>
+            </div>
+          </div>
+          <div class="edu-card">
+            <div class="edu-img" style="background:#f77f00"></div>
+            <div class="edu-body">
+              <div class="edu-tag">META 12.4 · MATERIALES PELIGROSOS</div>
+              <h4>El plomo y mercurio en tus dispositivos</h4>
+              <p>Los monitores CRT contienen hasta 4kg de plomo. Si van al vertedero, contaminan el suelo y el agua subterránea durante décadas. 🚨</p>
+            </div>
+          </div>
+          <div class="edu-card">
+            <div class="edu-img" style="background:#457b9d"></div>
+            <div class="edu-body">
+              <div class="edu-tag">META 12.8 · SENSIBILIZACIÓN</div>
+              <h4>La mochila ecológica de tu smartphone</h4>
+              <p>Fabricar un smartphone de 200g requiere procesar 70kg de materias primas. Extender su vida útil 1 año reduce un 30% su huella total. 📱</p>
+            </div>
+          </div>
+          <div class="edu-card">
+            <div class="edu-img" style="background:#6a4c93"></div>
+            <div class="edu-body">
+              <div class="edu-tag">COLOMBIA · NORMATIVA</div>
+              <h4>Resolución 1297 y RAEE en Colombia</h4>
+              <p>Colombia regula los residuos de aparatos eléctricos (RAEE) mediante sistemas de recolección. Ecoñato te ayuda a cumplir esta normativa. 🇨🇴</p>
+            </div>
+          </div>
+          <div class="edu-card">
+            <div class="edu-img" style="background:#2b9348"></div>
+            <div class="edu-body">
+              <div class="edu-tag">BUENAS PRÁCTICAS · PYME</div>
+              <h4>5 pasos para gestionar tu e-waste</h4>
+              <p>1. Inventaría tus equipos 2. Clasifica por estado 3. Extiende la vida útil 4. Dona o repara 5. Recicla con certificación responsable. ✅</p>
+            </div>
+          </div>
+          <div class="edu-card">
+            <div class="edu-img" style="background:#e63946"></div>
+            <div class="edu-body">
+              <div class="edu-tag">IMPACTO GLOBAL · ODS</div>
+              <h4>El e-waste en cifras para 2030</h4>
+              <p>Se proyectan 74 millones de toneladas de e-waste para 2030. Cada empresa que actúa hoy contribuye al cumplimiento de los ODS globales. 🌍</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div>
+</div><!-- /page-app -->
+
+<!-- MODAL: ADD EQUIPMENT -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2><i class="fa fa-plus-circle" style="color:var(--g3)"></i> Registrar equipo electrónico</h2>
+    <div class="form-group"><label>Nombre del equipo</label><input id="m-name" placeholder="Ej: Laptop HP EliteBook"></div>
+    <div class="modal .form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>Tipo</label>
+        <select id="m-type">
+          <option>Laptop</option><option>Desktop</option><option>Monitor</option><option>Smartphone</option>
+          <option>Impresora</option><option>Servidor</option><option>Tablet</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Marca</label><input id="m-brand" placeholder="HP, Dell, Samsung..."></div>
+    </div>
+    <div class="modal .form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>Año</label><input id="m-year" type="number" placeholder="2019" min="1990" max="2025"></div>
+      <div class="form-group"><label>Estado</label>
+        <select id="m-status">
+          <option>Reciclable</option><option>Reparable</option><option>Donable</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label>Materiales presentes</label>
+      <select id="m-materials" multiple style="height:90px">
+        <option>Cobre</option><option>Oro</option><option>Plata</option><option>Plástico</option>
+        <option>Aluminio</option><option>Plomo</option><option>Mercurio</option><option>Litio</option>
+      </select>
+      <small style="color:#888">Ctrl+clic para seleccionar varios</small>
+    </div>
+    <div class="form-group"><label>Notas adicionales</label><textarea id="m-notes" placeholder="Descripción del estado, componentes dañados..."></textarea></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEquipment()"><i class="fa fa-save"></i> Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let currentUser = null;
+let inventory = [];
+let chartStatus, chartTrend, chartMaterials, chartCircular;
+
+// ===== DEMO DATA =====
+const demoUser = {name:'Empresa Demo S.A.S',email:'demo@econato.co',pass:'demo1234',nit:'900.123.456-7',sector:'Tecnología'};
+const demoInventory = [
+  {id:1,name:'Laptop HP EliteBook 840',type:'Laptop',brand:'HP',year:2018,status:'Reciclable',materials:['Cobre','Oro','Plástico','Aluminio'],notes:'Pantalla rota, HDD funcional',date:'2025-01-15'},
+  {id:2,name:'Monitor Dell 24"',type:'Monitor',brand:'Dell',year:2016,status:'Donable',materials:['Plástico','Cobre'],notes:'En buen estado, sin cable',date:'2025-01-20'},
+  {id:3,name:'Servidor Dell PowerEdge',type:'Servidor',brand:'Dell',year:2015,status:'Reciclable',materials:['Cobre','Aluminio','Oro','Plata'],notes:'Fuera de soporte',date:'2025-02-03'},
+  {id:4,name:'Smartphone Samsung Galaxy S8',type:'Smartphone',brand:'Samsung',year:2017,status:'Reparable',materials:['Litio','Oro','Cobre'],notes:'Batería dañada',date:'2025-02-10'},
+  {id:5,name:'Impresora HP LaserJet',type:'Impresora',brand:'HP',year:2014,status:'Procesado',materials:['Plástico','Cobre'],notes:'Reciclada correctamente',date:'2025-02-18'},
+  {id:6,name:'Desktop Lenovo ThinkCentre',type:'Desktop',brand:'Lenovo',year:2013,status:'Reciclable',materials:['Cobre','Plomo','Plástico'],notes:'Contiene plomo - manejo especial',date:'2025-03-01'},
+];
+
+// ===== NAVIGATION =====
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function showTab(id){
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none');
+  document.getElementById(id).style.display='block';
+  document.querySelectorAll('.sidebar nav a').forEach(a=>a.classList.remove('active'));
+  const navId = 'nav-' + id.replace('tab-','');
+  const el = document.getElementById(navId);
+  if(el) el.classList.add('active');
+  if(id==='tab-dashboard') renderDashboard();
+  if(id==='tab-inventory') renderInventory();
+  if(id==='tab-stats') renderStats();
+}
+
+// ===== AUTH =====
+function doLogin(){
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  // Check stored users
+  const stored = JSON.parse(localStorage.getItem('econato_users')||'[]');
+  const found = stored.find(u=>u.email===email&&u.pass===pass) || (email===demoUser.email&&pass===demoUser.pass?demoUser:null);
+  if(found){
+    currentUser = found;
+    inventory = JSON.parse(localStorage.getItem('econato_inv_'+email)||JSON.stringify(demoInventory));
+    err.style.display='none';
+    document.getElementById('sidebar-name').textContent = found.name;
+    document.getElementById('sidebar-email').textContent = found.email;
+    showPage('page-app');
+    showTab('tab-dashboard');
+    notify('¡Bienvenido, '+found.name+'!');
+  } else {
+    err.style.display='block';
+  }
+}
+
+function doRegister(){
+  const name=document.getElementById('reg-name').value;
+  const nit=document.getElementById('reg-nit').value;
+  const sector=document.getElementById('reg-sector').value;
+  const email=document.getElementById('reg-email').value;
+  const pass=document.getElementById('reg-pass').value;
+  const pass2=document.getElementById('reg-pass2').value;
+  if(!name||!email||!pass){notify('Completa todos los campos');return;}
+  if(pass!==pass2){notify('Las contraseñas no coinciden');return;}
+  const users = JSON.parse(localStorage.getItem('econato_users')||'[]');
+  users.push({name,nit,sector,email,pass});
+  localStorage.setItem('econato_users',JSON.stringify(users));
+  notify('Cuenta creada. Inicia sesión.');
+  showPage('page-login');
+}
+
+function doLogout(){
+  saveInv();
+  currentUser=null;
+  showPage('page-landing');
+}
+
+function saveInv(){
+  if(currentUser) localStorage.setItem('econato_inv_'+currentUser.email, JSON.stringify(inventory));
+}
+
+// ===== NOTIFY =====
+function notify(msg){
+  const n=document.getElementById('notif');
+  document.getElementById('notif-msg').textContent=msg;
+  n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),3000);
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const total=inventory.length;
+  const rec=inventory.filter(i=>i.status==='Reciclable').length;
+  const rep=inventory.filter(i=>i.status==='Reparable').length;
+  const don=inventory.filter(i=>i.status==='Donable').length;
+  const proc=inventory.filter(i=>i.status==='Procesado').length;
+  document.getElementById('kpi-row').innerHTML=`
+    <div class="kpi"><div class="kpi-icon" style="background:#d8f3dc"><i class="fa fa-boxes-stacked" style="color:#2d6a4f"></i></div><div class="kpi-info"><div class="num">${total}</div><div class="lbl">Equipos registrados</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#f8d7da"><i class="fa fa-recycle" style="color:#842029"></i></div><div class="kpi-info"><div class="num">${rec}</div><div class="lbl">Por reciclar</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#fff3cd"><i class="fa fa-screwdriver-wrench" style="color:#856404"></i></div><div class="kpi-info"><div class="num">${rep}</div><div class="lbl">Reparables</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#cfe2ff"><i class="fa fa-handshake" style="color:#084298"></i></div><div class="kpi-info"><div class="num">${don}</div><div class="lbl">Donables</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#d8f3dc"><i class="fa fa-check-circle" style="color:#1b4332"></i></div><div class="kpi-info"><div class="num">${proc}</div><div class="lbl">Procesados</div></div></div>
+  `;
+  // Charts
+  if(chartStatus) chartStatus.destroy();
+  if(chartTrend) chartTrend.destroy();
+  const ctx1=document.getElementById('chartStatus').getContext('2d');
+  chartStatus=new Chart(ctx1,{type:'doughnut',data:{labels:['Reciclable','Reparable','Donable','Procesado'],datasets:[{data:[rec,rep,don,proc],backgroundColor:['#e63946','#f77f00','#457b9d','#2d6a4f'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom'}},cutout:'65%'}});
+  const ctx2=document.getElementById('chartTrend').getContext('2d');
+  const months=['Sep','Oct','Nov','Dic','Ene','Feb','Mar'];
+  chartTrend=new Chart(ctx2,{type:'line',data:{labels:months,datasets:[{label:'Equipos',data:[2,3,1,4,3,5,inventory.length],borderColor:'#40916c',backgroundColor:'rgba(64,145,108,.15)',tension:.4,fill:true,pointRadius:5}]},options:{scales:{y:{beginAtZero:true,grid:{color:'#eee'}}},plugins:{legend:{display:false}}}});
+  // Recent
+  const tbody=document.getElementById('recent-tbody');
+  const recent=[...inventory].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
+  tbody.innerHTML=recent.map(i=>`<tr><td><strong>${i.name}</strong></td><td>${i.type}</td><td>${badgeHtml(i.status)}</td><td>${i.date}</td></tr>`).join('');
+}
+
+// ===== INVENTORY =====
+function renderInventory(){
+  const q=(document.getElementById('search-inv')||{}).value?.toLowerCase()||'';
+  const fs=(document.getElementById('filter-status')||{}).value||'';
+  const filtered=inventory.filter(i=>{
+    const match=i.name.toLowerCase().includes(q)||i.type.toLowerCase().includes(q)||i.brand.toLowerCase().includes(q);
+    const stMatch=!fs||i.status===fs;
+    return match&&stMatch;
+  });
+  const tbody=document.getElementById('inv-tbody');
+  if(!filtered.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">Sin resultados</td></tr>';return;}
+  tbody.innerHTML=filtered.map(i=>`
+    <tr>
+      <td><strong>${i.name}</strong><br><small style="color:#888">${i.notes||''}</small></td>
+      <td>${i.type}</td><td>${i.brand}</td>
+      <td>${badgeHtml(i.status)}</td>
+      <td style="font-size:.8rem">${(i.materials||[]).join(', ')}</td>
+      <td>${i.date}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="markProcessed(${i.id})" ${i.status==='Procesado'?'disabled':''}>✓</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteEquip(${i.id})"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+function badgeHtml(status){
+  const map={Reciclable:'badge-red',Reparable:'badge-yellow',Donable:'badge-blue',Procesado:'badge-green'};
+  return `<span class="badge ${map[status]||'badge-green'}">${status}</span>`;
+}
+
+function markProcessed(id){
+  const i=inventory.find(x=>x.id===id);
+  if(i){i.status='Procesado';saveInv();renderInventory();notify('Equipo marcado como procesado ✓');}
+}
+
+function deleteEquip(id){
+  inventory=inventory.filter(x=>x.id!==id);
+  saveInv();renderInventory();notify('Equipo eliminado');
+}
+
+// ===== MODAL =====
+function openModal(){document.getElementById('modal').classList.add('open');}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+
+function saveEquipment(){
+  const name=document.getElementById('m-name').value;
+  const type=document.getElementById('m-type').value;
+  const brand=document.getElementById('m-brand').value;
+  const year=document.getElementById('m-year').value;
+  const status=document.getElementById('m-status').value;
+  const matEl=document.getElementById('m-materials');
+  const materials=Array.from(matEl.selectedOptions).map(o=>o.value);
+  const notes=document.getElementById('m-notes').value;
+  if(!name||!brand){notify('Completa nombre y marca');return;}
+  const newItem={id:Date.now(),name,type,brand,year,status,materials,notes,date:new Date().toISOString().split('T')[0]};
+  inventory.unshift(newItem);
+  saveInv();closeModal();renderInventory();
+  notify('Equipo registrado correctamente 🎉');
+  ['m-name','m-brand','m-year','m-notes'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ===== STATS =====
+function renderStats(){
+  const total=inventory.length;
+  const kg=total*2.3;
+  const co2=total*15;
+  const mat={Cobre:0,Oro:0,Plata:0,Aluminio:0,Plomo:0,Plástico:0,Litio:0};
+  inventory.forEach(i=>(i.materials||[]).forEach(m=>{if(mat[m]!==undefined)mat[m]+=Math.random()*.5+.1;}));
+
+  document.getElementById('stats-kpi').innerHTML=`
+    <div class="kpi"><div class="kpi-icon" style="background:#d8f3dc"><i class="fa fa-weight-hanging" style="color:#2d6a4f"></i></div><div class="kpi-info"><div class="num">${kg.toFixed(1)} kg</div><div class="lbl">Materiales recuperados</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#fff3cd"><i class="fa fa-cloud" style="color:#856404"></i></div><div class="kpi-info"><div class="num">${co2.toFixed(0)} kg</div><div class="lbl">CO₂ evitado</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#cfe2ff"><i class="fa fa-droplet" style="color:#084298"></i></div><div class="kpi-info"><div class="num">${(total*120).toFixed(0)} L</div><div class="lbl">Agua preservada</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#f8d7da"><i class="fa fa-bolt" style="color:#842029"></i></div><div class="kpi-info"><div class="num">${(total*45).toFixed(0)} kWh</div><div class="lbl">Energía ahorrada</div></div></div>
+  `;
+  if(chartMaterials) chartMaterials.destroy();
+  if(chartCircular) chartCircular.destroy();
+  const ctx3=document.getElementById('chartMaterials').getContext('2d');
+  const matKeys=Object.keys(mat);
+  const matVals=Object.values(mat).map(v=>+v.toFixed(2));
+  chartMaterials=new Chart(ctx3,{type:'bar',data:{labels:matKeys,datasets:[{label:'kg recuperados',data:matVals,backgroundColor:'rgba(64,145,108,.7)',borderColor:'#2d6a4f',borderWidth:1}]},options:{scales:{y:{beginAtZero:true}},plugins:{legend:{display:false}}}});
+  const ctx4=document.getElementById('chartCircular').getContext('2d');
+  const rec=inventory.filter(i=>i.status==='Reciclable').length;
+  const rep=inventory.filter(i=>i.status==='Reparable').length;
+  const don=inventory.filter(i=>i.status==='Donable').length;
+  const proc=inventory.filter(i=>i.status==='Procesado').length;
+  chartCircular=new Chart(ctx4,{type:'polarArea',data:{labels:['Reciclable','Reparable','Donable','Procesado'],datasets:[{data:[rec,rep,don,proc],backgroundColor:['rgba(230,57,70,.6)','rgba(247,127,0,.6)','rgba(69,123,157,.6)','rgba(45,106,79,.6)']}]},options:{plugins:{legend:{position:'bottom'}}}});
+  // Huella bars
+  const cats=[{lbl:'Cobre recuperado',pct:Math.min(100,matVals[0]*40)},{lbl:'Reducción huella total',pct:Math.min(100,total*8)},{lbl:'Equipos con ciclo cerrado',pct:Math.min(100,proc/Math.max(1,total)*100)},{lbl:'Meta mensual',pct:Math.min(100,total*10)}];
+  document.getElementById('huella-bars').innerHTML=cats.map(c=>`
+    <div style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.9rem">${c.lbl}</span><strong style="color:var(--g2)">${c.pct.toFixed(0)}%</strong></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${c.pct}%"></div></div>
+    </div>`).join('');
+}
+
+// ===== REPORTS =====
+function genReport(type){
+  const out=document.getElementById('report-output');
+  const user=currentUser||demoUser;
+  const total=inventory.length;
+  const proc=inventory.filter(i=>i.status==='Procesado').length;
+  const date=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+  if(type==='cert'){
+    out.innerHTML=`<div class="cert-preview"><h3>🌱 CERTIFICADO DE DISPOSICIÓN RESPONSABLE</h3><p style="margin:10px 0;font-size:1rem">Otorgado a: <strong>${user.name}</strong></p><p>Se certifica que ha gestionado <strong>${total} equipos electrónicos</strong> de manera sostenible a través de la plataforma Ecoñato, cumpliendo con los estándares de la meta 12.5 del ODS 12.</p><p style="margin-top:12px;opacity:.7">Emitido el ${date} · Folio: ECO-${Date.now().toString().slice(-6)}</p></div>`;
+  } else if(type==='mensual'){
+    out.innerHTML=`<div class="widget" style="margin-top:16px"><h3><i class="fa fa-file-lines"></i> Informe Mensual — ${date}</h3><p>Empresa: <strong>${user.name}</strong></p><br><p>✅ Equipos registrados: <strong>${total}</strong></p><p>✅ Procesados correctamente: <strong>${proc}</strong></p><p>✅ Materiales recuperados: <strong>${(total*2.3).toFixed(1)} kg</strong></p><p>✅ CO₂ evitado: <strong>${(total*15).toFixed(0)} kg</strong></p><p style="margin-top:12px;color:var(--g3);font-weight:600">Cumplimiento meta 12.5: ${Math.min(100,total*10)}%</p></div>`;
+  } else {
+    out.innerHTML=`<div class="widget" style="margin-top:16px"><h3><i class="fa fa-globe"></i> Reporte Anual ODS 12 — ${user.name}</h3><p><strong>META 12.4:</strong> Registro de ${inventory.filter(i=>i.materials?.includes('Plomo')||i.materials?.includes('Mercurio')).length} equipos con materiales peligrosos.</p><br><p><strong>META 12.5:</strong> ${total} equipos gestionados. ${inventory.filter(i=>i.status==='Reparable'||i.status==='Donable').length} reutilizados/donados antes del reciclaje final.</p><br><p><strong>META 12.6:</strong> Informes generados automáticamente. Integración disponible en memoria de sostenibilidad.</p><br><p><strong>META 12.8:</strong> Acceso a 6 artículos educativos sobre e-waste y ODS 12.</p></div>`;
+  }
+  notify('Reporte generado exitosamente');
+}
+
+// ===== INIT =====
+window.addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal')) closeModal();
+});
+</script>
+</body>
+</html>

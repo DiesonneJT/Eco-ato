@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión — Ecoñato</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <div class="logo-auth"><i class="fa fa-leaf" style="color:var(--g4)"></i> Eco<span>ñato</span></div>
+      <div class="subtitle">Inicia sesión en tu cuenta</div>
+
+      <div class="auth-error" id="login-error">Credenciales incorrectas. Intenta de nuevo.</div>
+
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" id="login-email" placeholder="empresa@correo.com" value="demo@econato.co">
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="••••••••" value="demo1234">
+      </div>
+
+      <button class="btn btn-primary" onclick="doLogin()">
+        <i class="fa fa-right-to-bracket"></i> Iniciar sesión
+      </button>
+
+      <div class="auth-switch">
+        ¿No tienes cuenta? <a href="register.html">Regístrate aquí</a>
+      </div>
+      <div class="auth-switch" style="margin-top:8px">
+        <a href="landing.html"><i class="fa fa-arrow-left"></i> Volver al inicio</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Datos demo incorporados — en producción esto vendría de un backend
+    const DEMO_USER = { name: 'Empresa Demo S.A.S', email: 'demo@econato.co', pass: 'demo1234', nit: '900.123.456-7', sector: 'Tecnología' };
+
+    function doLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const pass  = document.getElementById('login-pass').value;
+      const err   = document.getElementById('login-error');
+
+      // Buscar en usuarios registrados
+      const stored = JSON.parse(localStorage.getItem('econato_users') || '[]');
+      const found  = stored.find(u => u.email === email && u.pass === pass)
+                  || (email === DEMO_USER.email && pass === DEMO_USER.pass ? DEMO_USER : null);
+
+      if (found) {
+        // Guardar sesión activa
+        sessionStorage.setItem('econato_current_user', JSON.stringify(found));
+        err.style.display = 'none';
+        window.location.href = 'app.html';
+      } else {
+        err.style.display = 'block';
+      }
+    }
+
+    // Permitir Enter para hacer login
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  </script>
+
+</body>
+</html>
