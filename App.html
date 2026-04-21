@@ -6,16 +6,17 @@
   <title>App — Ecoñato</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<!-- NOTIFICACIÓN -->
+  
 <div class="notification" id="notif"><i class="fa fa-check-circle"></i> <span id="notif-msg"></span></div>
 
 <div class="app-layout">
 
-  <!-- ===== SIDEBAR ===== -->
+
   <div class="sidebar" id="sidebar">
     <div class="s-logo"><i class="fa fa-leaf"></i> Eco<span>ñato</span></div>
     <nav>
@@ -44,7 +45,7 @@
     </div>
   </div>
 
-  <!-- ===== CONTENIDO PRINCIPAL ===== -->
+
   <div class="main-content">
 
     <!-- TAB: DASHBOARD -->
@@ -79,7 +80,7 @@
       </div>
     </div>
 
-    <!-- TAB: INVENTARIO -->
+
     <div id="tab-inventory" style="display:none">
       <div class="top-bar">
         <h1>Gestión de Inventario</h1>
@@ -111,7 +112,7 @@
       </div>
     </div>
 
-    <!-- TAB: ESTADÍSTICAS -->
+
     <div id="tab-stats" style="display:none">
       <div class="top-bar"><h1>Estadísticas</h1></div>
       <div class="kpi-row" id="stats-kpi"></div>
@@ -131,7 +132,7 @@
       </div>
     </div>
 
-    <!-- TAB: REPORTES -->
+
     <div id="tab-reports" style="display:none">
       <div class="top-bar"><h1>Reportes de Sostenibilidad</h1></div>
       <div class="report-card">
@@ -139,23 +140,22 @@
           <h4><i class="fa fa-file-pdf" style="color:#e63946"></i> Informe Mensual de Reciclaje</h4>
           <p>Resumen de equipos gestionados, materiales recuperados y huella reducida este mes.</p>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="genReport('mensual')"><i class="fa fa-download"></i> Generar</button>
+        <button class="btn btn-primary btn-sm" id="btn-mensual" onclick="genReport('mensual')"><i class="fa fa-download"></i> Descargar PDF</button>
       </div>
       <div class="report-card">
         <div class="report-info">
-          <h4><i class="fa fa-certificate" style="color:var(--acc)"></i> Certificados de Disposición Responsable</h4>
-          <p>Comprobantes individuales por equipo ingresado al sistema.</p>
+          <h4><i class="fa fa-certificate" style="color:var(--acc)"></i> Certificado de Disposición Responsable</h4>
+          <p>Comprobante oficial de gestión responsable de residuos electrónicos.</p>
         </div>
-        <button class="btn btn-acc btn-sm" onclick="genReport('cert')"><i class="fa fa-download"></i> Generar</button>
+        <button class="btn btn-acc btn-sm" id="btn-cert" onclick="genReport('cert')"><i class="fa fa-download"></i> Descargar PDF</button>
       </div>
       <div class="report-card">
         <div class="report-info">
           <h4><i class="fa fa-chart-bar" style="color:var(--g3)"></i> Reporte Anual ODS 12</h4>
           <p>Informe completo de cumplimiento de metas 12.4, 12.5, 12.6 y 12.8.</p>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="genReport('anual')"><i class="fa fa-download"></i> Generar</button>
+        <button class="btn btn-primary btn-sm" id="btn-anual" onclick="genReport('anual')"><i class="fa fa-download"></i> Descargar PDF</button>
       </div>
-      <div id="report-output"></div>
     </div>
 
     <!-- TAB: EDUCACIÓN -->
@@ -213,10 +213,10 @@
       </div>
     </div>
 
-  </div><!-- /main-content -->
-</div><!-- /app-layout -->
+  </div>
+</div>
 
-<!-- MODAL: REGISTRAR EQUIPO -->
+
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h2><i class="fa fa-plus-circle" style="color:var(--g3)"></i> Registrar equipo electrónico</h2>
@@ -271,7 +271,6 @@
 
 <script>
 
-//  ESTADO DE LA APP
 let currentUser = null;
 let inventory   = [];
 let chartStatus, chartTrend, chartMaterials, chartCircular;
@@ -286,7 +285,6 @@ const DEMO_INV = [
 ];
 
 
-//  INICIALIZACION
 (function init() {
   const stored = sessionStorage.getItem('econato_current_user');
   if (!stored) {
@@ -301,7 +299,6 @@ const DEMO_INV = [
 })();
 
 
-//  NAVEGACION
 function showTab(id) {
   document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
   document.getElementById(id).style.display = 'block';
@@ -315,7 +312,6 @@ function showTab(id) {
 }
 
 
-//  Cerrar sesión
 function doLogout() {
   saveInv();
   sessionStorage.removeItem('econato_current_user');
@@ -327,7 +323,6 @@ function saveInv() {
 }
 
 
-//  NOTIFICACIONES
 function notify(msg) {
   const n = document.getElementById('notif');
   document.getElementById('notif-msg').textContent = msg;
@@ -336,7 +331,6 @@ function notify(msg) {
 }
 
 
-//  DASHBOARD
 function renderDashboard() {
   const total = inventory.length;
   const rec   = inventory.filter(i => i.status === 'Reciclable').length;
@@ -380,7 +374,6 @@ function renderDashboard() {
 }
 
 
-//  INVENTARIO
 function renderInventory() {
   const q  = (document.getElementById('search-inv')?.value || '').toLowerCase();
   const fs = document.getElementById('filter-status')?.value || '';
@@ -431,7 +424,6 @@ function deleteEquip(id) {
 }
 
 
-//  MODAL
 function openModal()  { document.getElementById('modal').classList.add('open'); }
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 
@@ -463,7 +455,6 @@ function saveEquipment() {
 }
 
 
-//  ESTADÍSTICAS
 function renderStats() {
   const total = inventory.length;
   const kg    = total * 2.3;
@@ -523,50 +514,325 @@ function renderStats() {
 }
 
 
-//  REPORTES
-function genReport(type) {
-  const user  = currentUser;
-  const total = inventory.length;
-  const proc  = inventory.filter(i => i.status === 'Procesado').length;
-  const date  = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
-  const out   = document.getElementById('report-output');
 
-  if (type === 'cert') {
-    out.innerHTML = `
-      <div class="cert-preview">
-        <h3>🌱 CERTIFICADO DE DISPOSICIÓN RESPONSABLE</h3>
-        <p style="margin:10px 0;font-size:1rem">Otorgado a: <strong>${user.name}</strong></p>
-        <p>Se certifica que ha gestionado <strong>${total} equipos electrónicos</strong> de manera sostenible a través de la plataforma Ecoñato, cumpliendo con los estándares de la meta 12.5 del ODS 12.</p>
-        <p style="margin-top:12px;opacity:.7">Emitido el ${date} · Folio: ECO-${Date.now().toString().slice(-6)}</p>
-      </div>`;
-  } else if (type === 'mensual') {
-    out.innerHTML = `
-      <div class="widget" style="margin-top:16px">
-        <h3><i class="fa fa-file-lines"></i> Informe Mensual — ${date}</h3>
-        <p>Empresa: <strong>${user.name}</strong></p><br>
-        <p>✅ Equipos registrados: <strong>${total}</strong></p>
-        <p>✅ Procesados correctamente: <strong>${proc}</strong></p>
-        <p>✅ Materiales recuperados: <strong>${(total*2.3).toFixed(1)} kg</strong></p>
-        <p>✅ CO₂ evitado: <strong>${(total*15).toFixed(0)} kg</strong></p>
-        <p style="margin-top:12px;color:var(--g3);font-weight:600">Cumplimiento meta 12.5: ${Math.min(100,total*10)}%</p>
-      </div>`;
-  } else {
-    const peligrosos = inventory.filter(i => i.materials?.includes('Plomo') || i.materials?.includes('Mercurio')).length;
-    const reutilizados = inventory.filter(i => i.status === 'Reparable' || i.status === 'Donable').length;
-    out.innerHTML = `
-      <div class="widget" style="margin-top:16px">
-        <h3><i class="fa fa-globe"></i> Reporte Anual ODS 12 — ${user.name}</h3>
-        <p><strong>META 12.4:</strong> Registro de ${peligrosos} equipos con materiales peligrosos.</p><br>
-        <p><strong>META 12.5:</strong> ${total} equipos gestionados. ${reutilizados} reutilizados/donados antes del reciclaje final.</p><br>
-        <p><strong>META 12.6:</strong> Informes generados automáticamente. Integración disponible en memoria de sostenibilidad.</p><br>
-        <p><strong>META 12.8:</strong> Acceso a 6 artículos educativos sobre e-waste y ODS 12.</p>
-      </div>`;
-  }
-  notify('Reporte generado exitosamente');
+function _pdfSetBtn(type, loading) {
+  const ids = { mensual:'btn-mensual', cert:'btn-cert', anual:'btn-anual' };
+  const btn = document.getElementById(ids[type]);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<i class="fa fa-spinner fa-spin"></i> Generando...'
+    : '<i class="fa fa-download"></i> Descargar PDF';
+}
+
+function _pdfHeader(doc, title, subtitle) {
+  const W = doc.internal.pageSize.getWidth();
+  doc.setFillColor(27, 67, 50);
+  doc.rect(0, 0, W, 28, 'F');
+  doc.setTextColor(149, 213, 178);
+  doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+  doc.text('Econato', 14, 18);
+  doc.setFillColor(64, 145, 108);
+  doc.roundedRect(W - 54, 8, 42, 12, 3, 3, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+  doc.text('ODS 12', W - 33, 16, { align: 'center' });
+  doc.setTextColor(27, 67, 50);
+  doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  doc.text(title, 14, 44);
+  doc.setTextColor(100, 100, 100);
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  doc.text(subtitle, 14, 52);
+  doc.setDrawColor(216, 243, 220); doc.setLineWidth(0.5);
+  doc.line(14, 56, W - 14, 56);
+  return 64;
+}
+
+function _pdfFooter(doc, folio) {
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  doc.setFillColor(27, 67, 50);
+  doc.rect(0, H - 16, W, 16, 'F');
+  doc.setTextColor(149, 213, 178);
+  doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+  doc.text('Econato — Tecnologia al servicio del planeta  |  ODS 12  |  2025', 14, H - 6);
+  doc.text(`Folio: ${folio}`, W - 14, H - 6, { align: 'right' });
+}
+
+function _pdfKpiBox(doc, x, y, w, h, label, value, color) {
+  doc.setFillColor(...color);
+  doc.roundedRect(x, y, w, h, 4, 4, 'F');
+  doc.setTextColor(27, 67, 50); doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  doc.text(value, x + w / 2, y + h / 2 - 1, { align: 'center' });
+  doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(80, 80, 80);
+  doc.text(label, x + w / 2, y + h / 2 + 7, { align: 'center' });
+}
+
+function _pdfSectionTitle(doc, text, y) {
+  const W = doc.internal.pageSize.getWidth();
+  doc.setFillColor(216, 243, 220);
+  doc.rect(14, y - 5, W - 28, 12, 'F');
+  doc.setTextColor(27, 67, 50); doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+  doc.text(text, 18, y + 3);
+  return y + 14;
 }
 
 
-//  CERRAR MODAL AL CLIC EN EL OVERLAY
+function _buildMensual(doc, user, inv) {
+  const W      = doc.internal.pageSize.getWidth();
+  const total  = inv.length;
+  const proc   = inv.filter(i => i.status === 'Procesado').length;
+  const rec    = inv.filter(i => i.status === 'Reciclable').length;
+  const rep    = inv.filter(i => i.status === 'Reparable').length;
+  const kg     = (total * 2.3).toFixed(1);
+  const co2    = (total * 15).toFixed(0);
+  const agua   = (total * 120).toFixed(0);
+  const kwh    = (total * 45).toFixed(0);
+  const fecha  = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  const folio  = `ECO-MEN-${Date.now().toString().slice(-6)}`;
+
+  let y = _pdfHeader(doc, 'Informe Mensual de Reciclaje', `Generado el ${fecha}`);
+
+  doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+  doc.text('Empresa:', 14, y);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+  doc.text(user.name || user.nombre || 'N/A', 40, y); y += 6;
+  doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+  doc.text('NIT:', 14, y);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+  doc.text(user.nit || 'N/A', 40, y); y += 12;
+
+  y = _pdfSectionTitle(doc, 'Resumen de equipos', y);
+  const bw = (W - 28 - 9) / 4;
+  _pdfKpiBox(doc, 14,           y, bw, 28, 'Total registrados', String(total), [216,243,220]);
+  _pdfKpiBox(doc, 14+bw+3,      y, bw, 28, 'Procesados',        String(proc),  [216,243,220]);
+  _pdfKpiBox(doc, 14+(bw+3)*2,  y, bw, 28, 'Por reciclar',      String(rec),   [248,215,218]);
+  _pdfKpiBox(doc, 14+(bw+3)*3,  y, bw, 28, 'Reparables',        String(rep),   [255,243,205]);
+  y += 34;
+
+  y = _pdfSectionTitle(doc, 'Impacto ambiental estimado', y);
+  _pdfKpiBox(doc, 14,           y, bw, 28, 'Materiales (kg)',   `${kg} kg`,   [216,243,220]);
+  _pdfKpiBox(doc, 14+bw+3,      y, bw, 28, 'CO2 evitado',       `${co2} kg`,  [207,226,255]);
+  _pdfKpiBox(doc, 14+(bw+3)*2,  y, bw, 28, 'Agua preservada',   `${agua} L`,  [207,226,255]);
+  _pdfKpiBox(doc, 14+(bw+3)*3,  y, bw, 28, 'Energia ahorrada',  `${kwh} kWh`, [255,243,205]);
+  y += 34;
+
+  y = _pdfSectionTitle(doc, 'Cumplimiento Meta 12.5 ODS', y);
+  const pct  = Math.min(100, total * 10);
+  const barW = W - 28;
+  doc.setFillColor(220, 220, 220); doc.roundedRect(14, y, barW, 10, 3, 3, 'F');
+  doc.setFillColor(64, 145, 108);  doc.roundedRect(14, y, barW * pct / 100, 10, 3, 3, 'F');
+  if (pct > 15) {
+    doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+    doc.text(`${pct.toFixed(0)}%`, 14 + (barW * pct / 100) / 2, y + 7, { align: 'center' });
+  }
+  doc.setTextColor(60, 60, 60); doc.setFont('helvetica', 'normal');
+  doc.text(`Meta mensual: ${pct.toFixed(0)}% completada`, 14, y + 18);
+  y += 24;
+
+  y = _pdfSectionTitle(doc, 'Detalle del inventario', y);
+  const cols = ['Equipo', 'Tipo', 'Marca', 'Estado', 'Fecha'];
+  const cw   = [70, 28, 28, 28, 28];
+  let x = 14;
+  doc.setFillColor(27, 67, 50); doc.rect(14, y, W - 28, 9, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
+  cols.forEach((c, i) => { doc.text(c, x + 2, y + 6); x += cw[i]; });
+  y += 9;
+
+  const stColors = { Reciclable:[230,57,70], Reparable:[247,127,0], Donable:[69,123,157], Procesado:[45,106,79] };
+  inv.slice(0, 20).forEach((item, idx) => {
+    if (y > 255) { doc.addPage(); _pdfHeader(doc, 'Informe Mensual', '(continuacion)'); y = 64; }
+    doc.setFillColor(idx % 2 === 0 ? 249 : 255, 255, idx % 2 === 0 ? 254 : 255);
+    doc.rect(14, y, W - 28, 8, 'F');
+    x = 14;
+    doc.setTextColor(50, 50, 50); doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+    [(item.name||'').substring(0,32), (item.type||''), (item.brand||''), '', (item.date||'')].forEach((v, i) => {
+      if (i !== 3) doc.text(String(v), x + 2, y + 5.5);
+      x += cw[i];
+    });
+    const sc = stColors[item.status] || [100, 100, 100];
+    const badgeX = 14 + cw[0] + cw[1] + cw[2] + 2;
+    doc.setFillColor(...sc); doc.roundedRect(badgeX, y + 1, 24, 5.5, 1.5, 1.5, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(6);
+    doc.text(item.status || '', badgeX + 12, y + 5.2, { align: 'center' });
+    y += 8;
+  });
+  if (inv.length > 20) {
+    doc.setFontSize(7); doc.setTextColor(120, 120, 120); doc.setFont('helvetica', 'italic');
+    doc.text(`... y ${inv.length - 20} equipos mas`, 14, y + 6);
+  }
+  _pdfFooter(doc, folio);
+}
+
+
+function _buildCert(doc, user, inv) {
+  const W     = doc.internal.pageSize.getWidth();
+  const H     = doc.internal.pageSize.getHeight();
+  const total = inv.length;
+  const proc  = inv.filter(i => i.status === 'Procesado').length;
+  const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  const folio = `ECO-CERT-${Date.now().toString().slice(-6)}`;
+
+  doc.setFillColor(27, 67, 50); doc.rect(0, 0, W, H, 'F');
+  doc.setFillColor(255, 255, 255); doc.roundedRect(10, 10, W - 20, H - 20, 6, 6, 'F');
+  doc.setFillColor(64, 145, 108); doc.rect(10, 10, W - 20, 18, 'F');
+  doc.setFillColor(247, 127, 0);  doc.rect(10, 24, W - 20, 4, 'F');
+
+  doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+  doc.text('ECONATO  |  ODS 12  |  GESTION DE E-WASTE', W / 2, 21, { align: 'center' });
+
+  doc.setTextColor(27, 67, 50); doc.setFontSize(22); doc.setFont('helvetica', 'bold');
+  doc.text('CERTIFICADO DE', W / 2, 52, { align: 'center' });
+  doc.text('DISPOSICION RESPONSABLE', W / 2, 64, { align: 'center' });
+
+  doc.setDrawColor(247, 127, 0); doc.setLineWidth(1.5);
+  doc.line(30, 70, W - 30, 70);
+
+  doc.setTextColor(80, 80, 80); doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  doc.text('Se certifica que la empresa', W / 2, 86, { align: 'center' });
+  doc.setTextColor(27, 67, 50); doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  doc.text(user.name || user.nombre || 'Empresa', W / 2, 98, { align: 'center' });
+  doc.setTextColor(80, 80, 80); doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  const lines = doc.splitTextToSize(`ha gestionado de manera sostenible ${total} equipos electronicos a traves de la plataforma Econato,`, W - 60);
+  doc.text(lines, W / 2, 112, { align: 'center' });
+  doc.setFontSize(9);
+  doc.text('cumpliendo los estandares de la', W / 2, 126, { align: 'center' });
+  doc.setFont('helvetica', 'bold'); doc.setTextColor(64, 145, 108);
+  doc.text('Meta 12.5 del Objetivo de Desarrollo Sostenible No. 12', W / 2, 134, { align: 'center' });
+
+  doc.setFillColor(216, 243, 220); doc.roundedRect(20, 142, W - 40, 34, 4, 4, 'F');
+  const bw3 = (W - 40 - 12) / 3;
+  [
+    { v: String(total),                   l: 'Equipos gestionados' },
+    { v: String(proc),                    l: 'Ciclos cerrados' },
+    { v: `${(total*2.3).toFixed(1)} kg`,  l: 'Materiales recuperados' },
+  ].forEach((s, i) => {
+    const bx = 20 + i * (bw3 + 4) + 2;
+    doc.setTextColor(27, 67, 50); doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+    doc.text(s.v, bx + bw3 / 2, 158, { align: 'center' });
+    doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(80, 80, 80);
+    doc.text(s.l, bx + bw3 / 2, 166, { align: 'center' });
+  });
+
+  doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5);
+  doc.line(30, 205, 90, 205); doc.line(W/2 + 10, 205, W/2 + 70, 205);
+  doc.setFontSize(8); doc.setTextColor(80, 80, 80); doc.setFont('helvetica', 'normal');
+  doc.text('Representante Legal', 60, 211, { align: 'center' });
+  doc.text('Director de Sostenibilidad', W/2 + 40, 211, { align: 'center' });
+
+  doc.setDrawColor(64, 145, 108); doc.setLineWidth(1.5); doc.circle(W/2, 198, 16, 'S');
+  doc.setLineWidth(0.5); doc.circle(W/2, 198, 14, 'S');
+  doc.setTextColor(64, 145, 108); doc.setFontSize(5.5); doc.setFont('helvetica', 'bold');
+  doc.text('ECONATO', W/2, 196, { align: 'center' });
+  doc.text('VERIFICADO', W/2, 202, { align: 'center' });
+
+  doc.setDrawColor(247, 127, 0); doc.setLineWidth(1); doc.line(30, 218, W - 30, 218);
+  doc.setTextColor(100, 100, 100); doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+  doc.text(`Emitido el ${fecha}`, W/2, 225, { align: 'center' });
+  doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+  doc.text(folio, W/2, 232, { align: 'center' });
+
+  doc.setDrawColor(247, 127, 0); doc.setLineWidth(0.8);
+  doc.roundedRect(12, 12, W - 24, H - 24, 5, 5, 'S');
+}
+
+
+function _buildAnual(doc, user, inv) {
+  const W          = doc.internal.pageSize.getWidth();
+  const total      = inv.length;
+  const proc       = inv.filter(i => i.status === 'Procesado').length;
+  const peligrosos = inv.filter(i => (i.materials||[]).includes('Plomo') || (i.materials||[]).includes('Mercurio')).length;
+  const reutiliz   = inv.filter(i => i.status === 'Reparable' || i.status === 'Donable').length;
+  const fecha      = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  const folio      = `ECO-ANUAL-${Date.now().toString().slice(-6)}`;
+  const anio       = new Date().getFullYear();
+
+  let y = _pdfHeader(doc, `Reporte Anual ODS 12 - ${anio}`, `Generado el ${fecha}  |  ${user.name || user.nombre}`);
+
+  doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+  doc.text('Empresa:', 14, y);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+  doc.text(user.name || user.nombre || 'N/A', 40, y); y += 10;
+
+  const bw4 = (W - 28 - 9) / 4;
+  _pdfKpiBox(doc, 14,            y, bw4, 28, 'Total equipos',      String(total),     [216,243,220]);
+  _pdfKpiBox(doc, 14+bw4+3,      y, bw4, 28, 'Procesados',         String(proc),      [216,243,220]);
+  _pdfKpiBox(doc, 14+(bw4+3)*2,  y, bw4, 28, 'Reutilizados',       String(reutiliz),  [207,226,255]);
+  _pdfKpiBox(doc, 14+(bw4+3)*3,  y, bw4, 28, 'Mat. peligrosos',    String(peligrosos),[248,215,218]);
+  y += 36;
+
+  const metas = [
+    { num:'12.4', titulo:'Gestion Ecologicamente Racional',
+      desc:`Se registraron ${peligrosos} equipo(s) con materiales peligrosos (plomo, mercurio), garantizando su disposicion conforme a marcos internacionales de gestion de residuos.`,
+      pct: Math.min(100, peligrosos > 0 ? 85 : 40) },
+    { num:'12.5', titulo:'Prevencion y Valorizacion',
+      desc:`${total} equipos gestionados en total. ${reutiliz} fueron reutilizados o donados antes de llegar al reciclaje final, extendiendo su ciclo de vida util.`,
+      pct: Math.min(100, total * 10) },
+    { num:'12.6', titulo:'Transparencia y Reportes Corporativos',
+      desc:'Informes de sostenibilidad generados automaticamente en formato PDF descargable. Datos listos para integrar en la memoria corporativa anual de la empresa.',
+      pct: 100 },
+    { num:'12.8', titulo:'Educacion y Conciencia Publica',
+      desc:'Centro educativo con 6 articulos sobre e-waste y ODS 12 disponibles para todos los colaboradores de la empresa registrada.',
+      pct: 80 },
+  ];
+
+  metas.forEach(m => {
+    if (y > 235) { doc.addPage(); _pdfHeader(doc, 'Reporte Anual ODS 12', '(continuacion)'); _pdfFooter(doc, folio); y = 64; }
+    y = _pdfSectionTitle(doc, `META ${m.num} - ${m.titulo}`, y);
+    const ls = doc.splitTextToSize(m.desc, W - 28);
+    doc.setFontSize(8.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+    doc.text(ls, 14, y); y += ls.length * 5 + 4;
+    const bW2 = W - 28;
+    doc.setFillColor(220, 220, 220); doc.roundedRect(14, y, bW2, 6, 2, 2, 'F');
+    doc.setFillColor(64, 145, 108);  doc.roundedRect(14, y, bW2 * m.pct / 100, 6, 2, 2, 'F');
+    doc.setTextColor(27, 67, 50); doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+    doc.text(`Cumplimiento: ${m.pct}%`, 14, y + 12);
+    y += 18;
+  });
+
+  if (y > 215) { doc.addPage(); _pdfHeader(doc, 'Reporte Anual ODS 12', '(continuacion)'); y = 64; }
+  y = _pdfSectionTitle(doc, 'Impacto Ambiental Acumulado', y);
+  [
+    ['Materiales recuperados estimados', `${(total*2.3).toFixed(1)} kg`],
+    ['CO2 equivalente evitado',          `${(total*15).toFixed(0)} kg`],
+    ['Agua preservada',                  `${(total*120).toFixed(0)} litros`],
+    ['Energia ahorrada',                 `${(total*45).toFixed(0)} kWh`],
+  ].forEach(([lbl, val], idx) => {
+    doc.setFillColor(idx%2===0 ? 249:255, 255, idx%2===0 ? 254:255);
+    doc.rect(14, y, W - 28, 8, 'F');
+    doc.setFontSize(8.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+    doc.text(lbl, 18, y + 5.5);
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+    doc.text(val, W - 18, y + 5.5, { align: 'right' });
+    y += 8;
+  });
+
+  _pdfFooter(doc, folio);
+}
+
+
+async function genReport(type) {
+  if (!window.jspdf) { notify('Libreria PDF no cargada aun, intenta en un momento'); return; }
+  const { jsPDF } = window.jspdf;
+  _pdfSetBtn(type, true);
+  try {
+    const doc      = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
+    const user     = currentUser || { name:'Empresa Demo', nit:'N/A', sector:'N/A' };
+    const names    = { mensual:`Econato_Informe_Mensual_${new Date().toISOString().slice(0,7)}.pdf`, cert:`Econato_Certificado_${Date.now().toString().slice(-6)}.pdf`, anual:`Econato_Reporte_Anual_${new Date().getFullYear()}.pdf` };
+    if (type === 'mensual') _buildMensual(doc, user, inventory);
+    if (type === 'cert')    _buildCert(doc, user, inventory);
+    if (type === 'anual')   _buildAnual(doc, user, inventory);
+    doc.save(names[type]);
+    notify(`PDF descargado correctamente`);
+  } catch(err) {
+    console.error(err);
+    notify('Error generando PDF. Revisa la consola.');
+  } finally {
+    _pdfSetBtn(type, false);
+  }
+}
+
+
 window.addEventListener('click', e => {
   if (e.target === document.getElementById('modal')) closeModal();
 });
