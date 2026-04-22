@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App — Ecoñato</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  
+<div class="notification" id="notif"><i class="fa fa-check-circle"></i> <span id="notif-msg"></span></div>
+
+<div class="app-layout">
+
+
+  <div class="sidebar" id="sidebar">
+    <div class="s-logo"><i class="fa fa-leaf"></i> Eco<span>ñato</span></div>
+    <nav>
+      <a onclick="showTab('tab-dashboard')" id="nav-dashboard" class="active">
+        <i class="fa fa-gauge"></i> Dashboard
+      </a>
+      <a onclick="showTab('tab-inventory')" id="nav-inventory">
+        <i class="fa fa-boxes-stacked"></i> Inventario
+      </a>
+      <a onclick="showTab('tab-stats')" id="nav-stats">
+        <i class="fa fa-chart-bar"></i> Estadísticas
+      </a>
+      <a onclick="showTab('tab-reports')" id="nav-reports">
+        <i class="fa fa-file-lines"></i> Reportes
+      </a>
+      <a onclick="showTab('tab-education')" id="nav-education">
+        <i class="fa fa-graduation-cap"></i> Educación
+      </a>
+    </nav>
+    <div class="s-user">
+      <strong id="sidebar-name">Empresa Demo</strong>
+      <span id="sidebar-email">demo@econato.co</span><br>
+      <a onclick="doLogout()" style="color:var(--g5);cursor:pointer;font-size:.82rem;margin-top:6px;display:inline-block">
+        <i class="fa fa-right-from-bracket"></i> Cerrar sesión
+      </a>
+    </div>
+  </div>
+
+
+  <div class="main-content">
+
+
+    <div id="tab-dashboard">
+      <div class="top-bar">
+        <h1>Dashboard</h1>
+        <div class="actions">
+          <button class="btn btn-primary btn-sm" onclick="showTab('tab-inventory')">
+            <i class="fa fa-plus"></i> Nuevo equipo
+          </button>
+        </div>
+      </div>
+      <div class="kpi-row" id="kpi-row"></div>
+      <div class="grid-2">
+        <div class="widget">
+          <h3><i class="fa fa-chart-pie"></i> Equipos por estado</h3>
+          <canvas id="chartStatus" height="220"></canvas>
+        </div>
+        <div class="widget">
+          <h3><i class="fa fa-chart-line"></i> Equipos registrados (últimos meses)</h3>
+          <canvas id="chartTrend" height="220"></canvas>
+        </div>
+      </div>
+      <div class="widget">
+        <h3><i class="fa fa-clock-rotate-left"></i> Últimos movimientos</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Equipo</th><th>Tipo</th><th>Estado</th><th>Fecha</th></tr></thead>
+            <tbody id="recent-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="tab-inventory" style="display:none">
+      <div class="top-bar">
+        <h1>Gestión de Inventario</h1>
+        <div class="actions">
+          <button class="btn btn-primary btn-sm" onclick="openModal()">
+            <i class="fa fa-plus"></i> Registrar equipo
+          </button>
+        </div>
+      </div>
+      <div class="inv-controls">
+        <input class="search-box" id="search-inv" placeholder="🔍 Buscar por nombre, tipo..." oninput="renderInventory()">
+        <select id="filter-status" class="search-box" style="max-width:180px" onchange="renderInventory()">
+          <option value="">Todos los estados</option>
+          <option>Reciclable</option>
+          <option>Reparable</option>
+          <option>Donable</option>
+          <option>Procesado</option>
+        </select>
+      </div>
+      <div class="widget">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>Equipo</th><th>Tipo</th><th>Marca</th><th>Estado</th><th>Materiales</th><th>Fecha</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="inv-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="tab-stats" style="display:none">
+      <div class="top-bar"><h1>Estadísticas</h1></div>
+      <div class="kpi-row" id="stats-kpi"></div>
+      <div class="grid-2">
+        <div class="widget">
+          <h3><i class="fa fa-circle-nodes"></i> Materiales recuperados (kg)</h3>
+          <canvas id="chartMaterials" height="240"></canvas>
+        </div>
+        <div class="widget">
+          <h3><i class="fa fa-arrows-spin"></i> Economía circular</h3>
+          <canvas id="chartCircular" height="240"></canvas>
+        </div>
+      </div>
+      <div class="widget" style="margin-top:20px">
+        <h3><i class="fa fa-leaf"></i> Reducción de huella ecológica</h3>
+        <div id="huella-bars"></div>
+      </div>
+    </div>
+
+
+    <div id="tab-reports" style="display:none">
+      <div class="top-bar"><h1>Reportes de Sostenibilidad</h1></div>
+      <div class="report-card">
+        <div class="report-info">
+          <h4><i class="fa fa-file-pdf" style="color:#e63946"></i> Informe Mensual de Reciclaje</h4>
+          <p>Resumen de equipos gestionados, materiales recuperados y huella reducida este mes.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btn-mensual" onclick="genReport('mensual')"><i class="fa fa-download"></i> Descargar PDF</button>
+      </div>
+      <div class="report-card">
+        <div class="report-info">
+          <h4><i class="fa fa-certificate" style="color:var(--acc)"></i> Certificado de Disposición Responsable</h4>
+          <p>Comprobante oficial de gestión responsable de residuos electrónicos.</p>
+        </div>
+        <button class="btn btn-acc btn-sm" id="btn-cert" onclick="genReport('cert')"><i class="fa fa-download"></i> Descargar PDF</button>
+      </div>
+      <div class="report-card">
+        <div class="report-info">
+          <h4><i class="fa fa-chart-bar" style="color:var(--g3)"></i> Reporte Anual ODS 12</h4>
+          <p>Informe completo de cumplimiento de metas 12.4, 12.5, 12.6 y 12.8.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="btn-anual" onclick="genReport('anual')"><i class="fa fa-download"></i> Descargar PDF</button>
+      </div>
+    </div>
+
+    <!-- TAB: EDUCACIÓN -->
+    <div id="tab-education" style="display:none">
+      <div class="top-bar"><h1>Centro Educativo</h1></div>
+      <div class="edu-grid">
+        <div class="edu-card">
+          <div class="edu-img" style="background:var(--g3)"></div>
+          <div class="edu-body">
+            <div class="edu-tag">META 12.5 · ECONOMÍA CIRCULAR</div>
+            <h4>¿Por qué reciclar tu laptop importa?</h4>
+            <p>Una laptop contiene oro, plata, cobre y paladio. Recuperar estos materiales consume 95% menos energía que extraerlos de la tierra. ♻️</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#f77f00"></div>
+          <div class="edu-body">
+            <div class="edu-tag">META 12.4 · MATERIALES PELIGROSOS</div>
+            <h4>El plomo y mercurio en tus dispositivos</h4>
+            <p>Los monitores CRT contienen hasta 4kg de plomo. Si van al vertedero, contaminan el suelo y el agua subterránea durante décadas. 🚨</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#457b9d"></div>
+          <div class="edu-body">
+            <div class="edu-tag">META 12.8 · SENSIBILIZACIÓN</div>
+            <h4>La mochila ecológica de tu smartphone</h4>
+            <p>Fabricar un smartphone de 200g requiere procesar 70kg de materias primas. Extender su vida útil 1 año reduce un 30% su huella total. 📱</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#6a4c93"></div>
+          <div class="edu-body">
+            <div class="edu-tag">COLOMBIA · NORMATIVA</div>
+            <h4>Resolución 1297 y RAEE en Colombia</h4>
+            <p>Colombia regula los residuos de aparatos eléctricos (RAEE) mediante sistemas de recolección. Ecoñato te ayuda a cumplir esta normativa. 🇨🇴</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#2b9348"></div>
+          <div class="edu-body">
+            <div class="edu-tag">BUENAS PRÁCTICAS · PYME</div>
+            <h4>5 pasos para gestionar tu e-waste</h4>
+            <p>1. Inventaría tus equipos 2. Clasifica por estado 3. Extiende la vida útil 4. Dona o repara 5. Recicla con certificación responsable. ✅</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#e63946"></div>
+          <div class="edu-body">
+            <div class="edu-tag">IMPACTO GLOBAL · ODS</div>
+            <h4>El e-waste en cifras para 2030</h4>
+            <p>Se proyectan 74 millones de toneladas de e-waste para 2030. Cada empresa que actúa hoy contribuye al cumplimiento de los ODS globales. 🌍</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2><i class="fa fa-plus-circle" style="color:var(--g3)"></i> Registrar equipo electrónico</h2>
+    <div class="form-group">
+      <label>Nombre del equipo</label>
+      <input id="m-name" placeholder="Ej: Laptop HP EliteBook">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="m-type">
+          <option>Laptop</option><option>Desktop</option><option>Monitor</option>
+          <option>Smartphone</option><option>Impresora</option><option>Servidor</option>
+          <option>Tablet</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Marca</label>
+        <input id="m-brand" placeholder="HP, Dell, Samsung...">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Año</label>
+        <input id="m-year" type="number" placeholder="2019" min="1990" max="2025">
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="m-status">
+          <option>Reciclable</option><option>Reparable</option><option>Donable</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Materiales presentes</label>
+      <select id="m-materials" multiple style="height:90px">
+        <option>Cobre</option><option>Oro</option><option>Plata</option><option>Plástico</option>
+        <option>Aluminio</option><option>Plomo</option><option>Mercurio</option><option>Litio</option>
+      </select>
+      <small style="color:#888">Ctrl+clic para seleccionar varios</small>
+    </div>
+    <div class="form-group">
+      <label>Notas adicionales</label>
+      <textarea id="m-notes" placeholder="Descripción del estado, componentes dañados..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEquipment()"><i class="fa fa-save"></i> Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+let currentUser = null;
+let inventory   = [];
+let chartStatus, chartTrend, chartMaterials, chartCircular;
+
+const DEMO_INV = [
+  {id:1,name:'Laptop HP EliteBook 840',type:'Laptop',brand:'HP',year:2018,status:'Reciclable',materials:['Cobre','Oro','Plástico','Aluminio'],notes:'Pantalla rota, HDD funcional',date:'2025-01-15'},
+  {id:2,name:'Monitor Dell 24"',type:'Monitor',brand:'Dell',year:2016,status:'Donable',materials:['Plástico','Cobre'],notes:'En buen estado, sin cable',date:'2025-01-20'},
+  {id:3,name:'Servidor Dell PowerEdge',type:'Servidor',brand:'Dell',year:2015,status:'Reciclable',materials:['Cobre','Aluminio','Oro','Plata'],notes:'Fuera de soporte',date:'2025-02-03'},
+  {id:4,name:'Smartphone Samsung Galaxy S8',type:'Smartphone',brand:'Samsung',year:2017,status:'Reparable',materials:['Litio','Oro','Cobre'],notes:'Batería dañada',date:'2025-02-10'},
+  {id:5,name:'Impresora HP LaserJet',type:'Impresora',brand:'HP',year:2014,status:'Procesado',materials:['Plástico','Cobre'],notes:'Reciclada correctamente',date:'2025-02-18'},
+  {id:6,name:'Desktop Lenovo ThinkCentre',type:'Desktop',brand:'Lenovo',year:2013,status:'Reciclable',materials:['Cobre','Plomo','Plástico'],notes:'Contiene plomo - manejo especial',date:'2025-03-01'},
+];
+
+
+(function init() {
+  const stored = sessionStorage.getItem('econato_current_user');
+  if (!stored) {
+    window.location.href = 'login.html';
+    return;
+  }
+  currentUser = JSON.parse(stored);
+  inventory   = JSON.parse(localStorage.getItem('econato_inv_' + currentUser.email) || JSON.stringify(DEMO_INV));
+  document.getElementById('sidebar-name').textContent  = currentUser.name;
+  document.getElementById('sidebar-email').textContent = currentUser.email;
+  showTab('tab-dashboard');
+})();
+
+
+function showTab(id) {
+  document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+  document.getElementById(id).style.display = 'block';
+  document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + id.replace('tab-', ''));
+  if (navEl) navEl.classList.add('active');
+
+  if (id === 'tab-dashboard') renderDashboard();
+  if (id === 'tab-inventory') renderInventory();
+  if (id === 'tab-stats')     renderStats();
+}
+
+
+function doLogout() {
+  saveInv();
+  sessionStorage.removeItem('econato_current_user');
+  window.location.href = 'landing.html';
+}
+
+function saveInv() {
+  if (currentUser) localStorage.setItem('econato_inv_' + currentUser.email, JSON.stringify(inventory));
+}
+
+
+function notify(msg) {
+  const n = document.getElementById('notif');
+  document.getElementById('notif-msg').textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+
+function renderDashboard() {
+  const total = inventory.length;
+  const rec   = inventory.filter(i => i.status === 'Reciclable').length;
+  const rep   = inventory.filter(i => i.status === 'Reparable').length;
+  const don   = inventory.filter(i => i.status === 'Donable').length;
+  const proc  = inventory.filter(i => i.status === 'Procesado').length;
+
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="kpi"><div class="kpi-icon" style="background:#d8f3dc"><i class="fa fa-boxes-stacked" style="color:#2d6a4f"></i></div><div class="kpi-info"><div class="num">${total}</div><div class="lbl">Equipos registrados</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#f8d7da"><i class="fa fa-recycle" style="color:#842029"></i></div><div class="kpi-info"><div class="num">${rec}</div><div class="lbl">Por reciclar</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#fff3cd"><i class="fa fa-screwdriver-wrench" style="color:#856404"></i></div><div class="kpi-info"><div class="num">${rep}</div><div class="lbl">Reparables</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#cfe2ff"><i class="fa fa-handshake" style="color:#084298"></i></div><div class="kpi-info"><div class="num">${don}</div><div class="lbl">Donables</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#d8f3dc"><i class="fa fa-check-circle" style="color:#1b4332"></i></div><div class="kpi-info"><div class="num">${proc}</div><div class="lbl">Procesados</div></div></div>
+  `;
+
+  if (chartStatus) chartStatus.destroy();
+  if (chartTrend)  chartTrend.destroy();
+
+  chartStatus = new Chart(document.getElementById('chartStatus').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Reciclable','Reparable','Donable','Procesado'],
+      datasets: [{ data:[rec,rep,don,proc], backgroundColor:['#e63946','#f77f00','#457b9d','#2d6a4f'], borderWidth:0 }]
+    },
+    options: { plugins:{ legend:{ position:'bottom' } }, cutout:'65%' }
+  });
+
+  chartTrend = new Chart(document.getElementById('chartTrend').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ['Sep','Oct','Nov','Dic','Ene','Feb','Mar'],
+      datasets: [{ label:'Equipos', data:[2,3,1,4,3,5,inventory.length], borderColor:'#40916c', backgroundColor:'rgba(64,145,108,.15)', tension:.4, fill:true, pointRadius:5 }]
+    },
+    options: { scales:{ y:{ beginAtZero:true, grid:{ color:'#eee' } } }, plugins:{ legend:{ display:false } } }
+  });
+
+  const recent = [...inventory].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
+  document.getElementById('recent-tbody').innerHTML = recent.map(i => `
+    <tr><td><strong>${i.name}</strong></td><td>${i.type}</td><td>${badgeHtml(i.status)}</td><td>${i.date}</td></tr>
+  `).join('');
+}
+
+
+function renderInventory() {
+  const q  = (document.getElementById('search-inv')?.value || '').toLowerCase();
+  const fs = document.getElementById('filter-status')?.value || '';
+
+  const filtered = inventory.filter(i => {
+    const match   = i.name.toLowerCase().includes(q) || i.type.toLowerCase().includes(q) || i.brand.toLowerCase().includes(q);
+    const stMatch = !fs || i.status === fs;
+    return match && stMatch;
+  });
+
+  const tbody = document.getElementById('inv-tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">Sin resultados</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(i => `
+    <tr>
+      <td><strong>${i.name}</strong><br><small style="color:#888">${i.notes || ''}</small></td>
+      <td>${i.type}</td>
+      <td>${i.brand}</td>
+      <td>${badgeHtml(i.status)}</td>
+      <td style="font-size:.8rem">${(i.materials || []).join(', ')}</td>
+      <td>${i.date}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="markProcessed(${i.id})" ${i.status==='Procesado'?'disabled':''}>✓</button>
+        <button class="btn btn-sm btn-danger"  onclick="deleteEquip(${i.id})"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function badgeHtml(status) {
+  const map = { Reciclable:'badge-red', Reparable:'badge-yellow', Donable:'badge-blue', Procesado:'badge-green' };
+  return `<span class="badge ${map[status] || 'badge-green'}">${status}</span>`;
+}
+
+function markProcessed(id) {
+  const item = inventory.find(x => x.id === id);
+  if (item) { item.status = 'Procesado'; saveInv(); renderInventory(); notify('Equipo marcado como procesado ✓'); }
+}
+
+function deleteEquip(id) {
+  inventory = inventory.filter(x => x.id !== id);
+  saveInv();
+  renderInventory();
+  notify('Equipo eliminado');
+}
+
+
+function openModal()  { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function saveEquipment() {
+  const name  = document.getElementById('m-name').value.trim();
+  const brand = document.getElementById('m-brand').value.trim();
+  if (!name || !brand) { notify('Completa nombre y marca'); return; }
+
+  const matEl     = document.getElementById('m-materials');
+  const materials = Array.from(matEl.selectedOptions).map(o => o.value);
+
+  inventory.unshift({
+    id: Date.now(),
+    name,
+    type:      document.getElementById('m-type').value,
+    brand,
+    year:      document.getElementById('m-year').value,
+    status:    document.getElementById('m-status').value,
+    materials,
+    notes:     document.getElementById('m-notes').value,
+    date:      new Date().toISOString().split('T')[0]
+  });
+
+  saveInv();
+  closeModal();
+  renderInventory();
+  notify('Equipo registrado correctamente 🎉');
+  ['m-name','m-brand','m-year','m-notes'].forEach(id => document.getElementById(id).value = '');
+}
+
+
+function renderStats() {
+  const total = inventory.length;
+  const kg    = total * 2.3;
+  const co2   = total * 15;
+  const mat   = { Cobre:0, Oro:0, Plata:0, Aluminio:0, Plomo:0, Plástico:0, Litio:0 };
+
+  inventory.forEach(i => (i.materials || []).forEach(m => {
+    if (mat[m] !== undefined) mat[m] += Math.random() * .5 + .1;
+  }));
+
+  document.getElementById('stats-kpi').innerHTML = `
+    <div class="kpi"><div class="kpi-icon" style="background:#d8f3dc"><i class="fa fa-weight-hanging" style="color:#2d6a4f"></i></div><div class="kpi-info"><div class="num">${kg.toFixed(1)} kg</div><div class="lbl">Materiales recuperados</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#fff3cd"><i class="fa fa-cloud" style="color:#856404"></i></div><div class="kpi-info"><div class="num">${co2.toFixed(0)} kg</div><div class="lbl">CO₂ evitado</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#cfe2ff"><i class="fa fa-droplet" style="color:#084298"></i></div><div class="kpi-info"><div class="num">${(total*120).toFixed(0)} L</div><div class="lbl">Agua preservada</div></div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#f8d7da"><i class="fa fa-bolt" style="color:#842029"></i></div><div class="kpi-info"><div class="num">${(total*45).toFixed(0)} kWh</div><div class="lbl">Energía ahorrada</div></div></div>
+  `;
+
+  if (chartMaterials) chartMaterials.destroy();
+  if (chartCircular)  chartCircular.destroy();
+
+  const matKeys = Object.keys(mat);
+  const matVals = Object.values(mat).map(v => +v.toFixed(2));
+
+  chartMaterials = new Chart(document.getElementById('chartMaterials').getContext('2d'), {
+    type: 'bar',
+    data: { labels: matKeys, datasets: [{ label:'kg recuperados', data:matVals, backgroundColor:'rgba(64,145,108,.7)', borderColor:'#2d6a4f', borderWidth:1 }] },
+    options: { scales:{ y:{ beginAtZero:true } }, plugins:{ legend:{ display:false } } }
+  });
+
+  const rec  = inventory.filter(i => i.status === 'Reciclable').length;
+  const rep  = inventory.filter(i => i.status === 'Reparable').length;
+  const don  = inventory.filter(i => i.status === 'Donable').length;
+  const proc = inventory.filter(i => i.status === 'Procesado').length;
+
+  chartCircular = new Chart(document.getElementById('chartCircular').getContext('2d'), {
+    type: 'polarArea',
+    data: { labels:['Reciclable','Reparable','Donable','Procesado'], datasets:[{ data:[rec,rep,don,proc], backgroundColor:['rgba(230,57,70,.6)','rgba(247,127,0,.6)','rgba(69,123,157,.6)','rgba(45,106,79,.6)'] }] },
+    options: { plugins:{ legend:{ position:'bottom' } } }
+  });
+
+  const cats = [
+    { lbl:'Cobre recuperado',      pct: Math.min(100, matVals[0] * 40) },
+    { lbl:'Reducción huella total', pct: Math.min(100, total * 8) },
+    { lbl:'Equipos con ciclo cerrado', pct: Math.min(100, proc / Math.max(1, total) * 100) },
+    { lbl:'Meta mensual',          pct: Math.min(100, total * 10) }
+  ];
+
+  document.getElementById('huella-bars').innerHTML = cats.map(c => `
+    <div style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:.9rem">${c.lbl}</span>
+        <strong style="color:var(--g2)">${c.pct.toFixed(0)}%</strong>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${c.pct}%"></div></div>
+    </div>
+  `).join('');
+}
+
+
+
+function _pdfSetBtn(type, loading) {
+  const ids = { mensual:'btn-mensual', cert:'btn-cert', anual:'btn-anual' };
+  const btn = document.getElementById(ids[type]);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<i class="fa fa-spinner fa-spin"></i> Generando...'
+    : '<i class="fa fa-download"></i> Descargar PDF';
+}
+
+function _pdfHeader(doc, title, subtitle) {
+  const W = doc.internal.pageSize.getWidth();
+  doc.setFillColor(27, 67, 50);
+  doc.rect(0, 0, W, 28, 'F');
+  doc.setTextColor(149, 213, 178);
+  doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+  doc.text('Econato', 14, 18);
+  doc.setFillColor(64, 145, 108);
+  doc.roundedRect(W - 54, 8, 42, 12, 3, 3, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+  doc.text('ODS 12', W - 33, 16, { align: 'center' });
+  doc.setTextColor(27, 67, 50);
+  doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  doc.text(title, 14, 44);
+  doc.setTextColor(100, 100, 100);
+  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+  doc.text(subtitle, 14, 52);
+  doc.setDrawColor(216, 243, 220); doc.setLineWidth(0.5);
+  doc.line(14, 56, W - 14, 56);
+  return 64;
+}
+
+function _pdfFooter(doc, folio) {
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  doc.setFillColor(27, 67, 50);
+  doc.rect(0, H - 16, W, 16, 'F');
+  doc.setTextColor(149, 213, 178);
+  doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+  doc.text('Econato — Tecnologia al servicio del planeta  |  ODS 12  |  2025', 14, H - 6);
+  doc.text(`Folio: ${folio}`, W - 14, H - 6, { align: 'right' });
+}
+
+function _pdfKpiBox(doc, x, y, w, h, label, value, color) {
+  doc.setFillColor(...color);
+  doc.roundedRect(x, y, w, h, 4, 4, 'F');
+  doc.setTextColor(27, 67, 50); doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  doc.text(value, x + w / 2, y + h / 2 - 1, { align: 'center' });
+  doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(80, 80, 80);
+  doc.text(label, x + w / 2, y + h / 2 + 7, { align: 'center' });
+}
+
+function _pdfSectionTitle(doc, text, y) {
+  const W = doc.internal.pageSize.getWidth();
+  doc.setFillColor(216, 243, 220);
+  doc.rect(14, y - 5, W - 28, 12, 'F');
+  doc.setTextColor(27, 67, 50); doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+  doc.text(text, 18, y + 3);
+  return y + 14;
+}
+
+
+function _buildMensual(doc, user, inv) {
+  const W      = doc.internal.pageSize.getWidth();
+  const total  = inv.length;
+  const proc   = inv.filter(i => i.status === 'Procesado').length;
+  const rec    = inv.filter(i => i.status === 'Reciclable').length;
+  const rep    = inv.filter(i => i.status === 'Reparable').length;
+  const kg     = (total * 2.3).toFixed(1);
+  const co2    = (total * 15).toFixed(0);
+  const agua   = (total * 120).toFixed(0);
+  const kwh    = (total * 45).toFixed(0);
+  const fecha  = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  const folio  = `ECO-MEN-${Date.now().toString().slice(-6)}`;
+
+  let y = _pdfHeader(doc, 'Informe Mensual de Reciclaje', `Generado el ${fecha}`);
+
+  doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+  doc.text('Empresa:', 14, y);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+  doc.text(user.name || user.nombre || 'N/A', 40, y); y += 6;
+  doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+  doc.text('NIT:', 14, y);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+  doc.text(user.nit || 'N/A', 40, y); y += 12;
+
+  y = _pdfSectionTitle(doc, 'Resumen de equipos', y);
+  const bw = (W - 28 - 9) / 4;
+  _pdfKpiBox(doc, 14,           y, bw, 28, 'Total registrados', String(total), [216,243,220]);
+  _pdfKpiBox(doc, 14+bw+3,      y, bw, 28, 'Procesados',        String(proc),  [216,243,220]);
+  _pdfKpiBox(doc, 14+(bw+3)*2,  y, bw, 28, 'Por reciclar',      String(rec),   [248,215,218]);
+  _pdfKpiBox(doc, 14+(bw+3)*3,  y, bw, 28, 'Reparables',        String(rep),   [255,243,205]);
+  y += 34;
+
+  y = _pdfSectionTitle(doc, 'Impacto ambiental estimado', y);
+  _pdfKpiBox(doc, 14,           y, bw, 28, 'Materiales (kg)',   `${kg} kg`,   [216,243,220]);
+  _pdfKpiBox(doc, 14+bw+3,      y, bw, 28, 'CO2 evitado',       `${co2} kg`,  [207,226,255]);
+  _pdfKpiBox(doc, 14+(bw+3)*2,  y, bw, 28, 'Agua preservada',   `${agua} L`,  [207,226,255]);
+  _pdfKpiBox(doc, 14+(bw+3)*3,  y, bw, 28, 'Energia ahorrada',  `${kwh} kWh`, [255,243,205]);
+  y += 34;
+
+  y = _pdfSectionTitle(doc, 'Cumplimiento Meta 12.5 ODS', y);
+  const pct  = Math.min(100, total * 10);
+  const barW = W - 28;
+  doc.setFillColor(220, 220, 220); doc.roundedRect(14, y, barW, 10, 3, 3, 'F');
+  doc.setFillColor(64, 145, 108);  doc.roundedRect(14, y, barW * pct / 100, 10, 3, 3, 'F');
+  if (pct > 15) {
+    doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+    doc.text(`${pct.toFixed(0)}%`, 14 + (barW * pct / 100) / 2, y + 7, { align: 'center' });
+  }
+  doc.setTextColor(60, 60, 60); doc.setFont('helvetica', 'normal');
+  doc.text(`Meta mensual: ${pct.toFixed(0)}% completada`, 14, y + 18);
+  y += 24;
+
+  y = _pdfSectionTitle(doc, 'Detalle del inventario', y);
+  const cols = ['Equipo', 'Tipo', 'Marca', 'Estado', 'Fecha'];
+  const cw   = [70, 28, 28, 28, 28];
+  let x = 14;
+  doc.setFillColor(27, 67, 50); doc.rect(14, y, W - 28, 9, 'F');
+  doc.setTextColor(255, 255, 255); doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
+  cols.forEach((c, i) => { doc.text(c, x + 2, y + 6); x += cw[i]; });
+  y += 9;
+
+  const stColors = { Reciclable:[230,57,70], Reparable:[247,127,0], Donable:[69,123,157], Procesado:[45,106,79] };
+  inv.slice(0, 20).forEach((item, idx) => {
+    if (y > 255) { doc.addPage(); _pdfHeader(doc, 'Informe Mensual', '(continuacion)'); y = 64; }
+    doc.setFillColor(idx % 2 === 0 ? 249 : 255, 255, idx % 2 === 0 ? 254 : 255);
+    doc.rect(14, y, W - 28, 8, 'F');
+    x = 14;
+    doc.setTextColor(50, 50, 50); doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+    [(item.name||'').substring(0,32), (item.type||''), (item.brand||''), '', (item.date||'')].forEach((v, i) => {
+      if (i !== 3) doc.text(String(v), x + 2, y + 5.5);
+      x += cw[i];
+    });
+    const sc = stColors[item.status] || [100, 100, 100];
+    const badgeX = 14 + cw[0] + cw[1] + cw[2] + 2;
+    doc.setFillColor(...sc); doc.roundedRect(badgeX, y + 1, 24, 5.5, 1.5, 1.5, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFontSize(6);
+    doc.text(item.status || '', badgeX + 12, y + 5.2, { align: 'center' });
+    y += 8;
+  });
+  if (inv.length > 20) {
+    doc.setFontSize(7); doc.setTextColor(120, 120, 120); doc.setFont('helvetica', 'italic');
+    doc.text(`... y ${inv.length - 20} equipos mas`, 14, y + 6);
+  }
+  _pdfFooter(doc, folio);
+}
+
+
+function _buildCert(doc, user, inv) {
+  const W     = doc.internal.pageSize.getWidth();
+  const H     = doc.internal.pageSize.getHeight();
+  const total = inv.length;
+  const proc  = inv.filter(i => i.status === 'Procesado').length;
+  const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  const folio = `ECO-CERT-${Date.now().toString().slice(-6)}`;
+
+  doc.setFillColor(27, 67, 50); doc.rect(0, 0, W, H, 'F');
+  doc.setFillColor(255, 255, 255); doc.roundedRect(10, 10, W - 20, H - 20, 6, 6, 'F');
+  doc.setFillColor(64, 145, 108); doc.rect(10, 10, W - 20, 18, 'F');
+  doc.setFillColor(247, 127, 0);  doc.rect(10, 24, W - 20, 4, 'F');
+
+  doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+  doc.text('ECONATO  |  ODS 12  |  GESTION DE E-WASTE', W / 2, 21, { align: 'center' });
+
+  doc.setTextColor(27, 67, 50); doc.setFontSize(22); doc.setFont('helvetica', 'bold');
+  doc.text('CERTIFICADO DE', W / 2, 52, { align: 'center' });
+  doc.text('DISPOSICION RESPONSABLE', W / 2, 64, { align: 'center' });
+
+  doc.setDrawColor(247, 127, 0); doc.setLineWidth(1.5);
+  doc.line(30, 70, W - 30, 70);
+
+  doc.setTextColor(80, 80, 80); doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  doc.text('Se certifica que la empresa', W / 2, 86, { align: 'center' });
+  doc.setTextColor(27, 67, 50); doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  doc.text(user.name || user.nombre || 'Empresa', W / 2, 98, { align: 'center' });
+  doc.setTextColor(80, 80, 80); doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  const lines = doc.splitTextToSize(`ha gestionado de manera sostenible ${total} equipos electronicos a traves de la plataforma Econato,`, W - 60);
+  doc.text(lines, W / 2, 112, { align: 'center' });
+  doc.setFontSize(9);
+  doc.text('cumpliendo los estandares de la', W / 2, 126, { align: 'center' });
+  doc.setFont('helvetica', 'bold'); doc.setTextColor(64, 145, 108);
+  doc.text('Meta 12.5 del Objetivo de Desarrollo Sostenible No. 12', W / 2, 134, { align: 'center' });
+
+  doc.setFillColor(216, 243, 220); doc.roundedRect(20, 142, W - 40, 34, 4, 4, 'F');
+  const bw3 = (W - 40 - 12) / 3;
+  [
+    { v: String(total),                   l: 'Equipos gestionados' },
+    { v: String(proc),                    l: 'Ciclos cerrados' },
+    { v: `${(total*2.3).toFixed(1)} kg`,  l: 'Materiales recuperados' },
+  ].forEach((s, i) => {
+    const bx = 20 + i * (bw3 + 4) + 2;
+    doc.setTextColor(27, 67, 50); doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+    doc.text(s.v, bx + bw3 / 2, 158, { align: 'center' });
+    doc.setFontSize(7); doc.setFont('helvetica', 'normal'); doc.setTextColor(80, 80, 80);
+    doc.text(s.l, bx + bw3 / 2, 166, { align: 'center' });
+  });
+
+  doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.5);
+  doc.line(30, 205, 90, 205); doc.line(W/2 + 10, 205, W/2 + 70, 205);
+  doc.setFontSize(8); doc.setTextColor(80, 80, 80); doc.setFont('helvetica', 'normal');
+  doc.text('Representante Legal', 60, 211, { align: 'center' });
+  doc.text('Director de Sostenibilidad', W/2 + 40, 211, { align: 'center' });
+
+  doc.setDrawColor(64, 145, 108); doc.setLineWidth(1.5); doc.circle(W/2, 198, 16, 'S');
+  doc.setLineWidth(0.5); doc.circle(W/2, 198, 14, 'S');
+  doc.setTextColor(64, 145, 108); doc.setFontSize(5.5); doc.setFont('helvetica', 'bold');
+  doc.text('ECONATO', W/2, 196, { align: 'center' });
+  doc.text('VERIFICADO', W/2, 202, { align: 'center' });
+
+  doc.setDrawColor(247, 127, 0); doc.setLineWidth(1); doc.line(30, 218, W - 30, 218);
+  doc.setTextColor(100, 100, 100); doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+  doc.text(`Emitido el ${fecha}`, W/2, 225, { align: 'center' });
+  doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+  doc.text(folio, W/2, 232, { align: 'center' });
+
+  doc.setDrawColor(247, 127, 0); doc.setLineWidth(0.8);
+  doc.roundedRect(12, 12, W - 24, H - 24, 5, 5, 'S');
+}
+
+
+function _buildAnual(doc, user, inv) {
+  const W          = doc.internal.pageSize.getWidth();
+  const total      = inv.length;
+  const proc       = inv.filter(i => i.status === 'Procesado').length;
+  const peligrosos = inv.filter(i => (i.materials||[]).includes('Plomo') || (i.materials||[]).includes('Mercurio')).length;
+  const reutiliz   = inv.filter(i => i.status === 'Reparable' || i.status === 'Donable').length;
+  const fecha      = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  const folio      = `ECO-ANUAL-${Date.now().toString().slice(-6)}`;
+  const anio       = new Date().getFullYear();
+
+  let y = _pdfHeader(doc, `Reporte Anual ODS 12 - ${anio}`, `Generado el ${fecha}  |  ${user.name || user.nombre}`);
+
+  doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+  doc.text('Empresa:', 14, y);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+  doc.text(user.name || user.nombre || 'N/A', 40, y); y += 10;
+
+  const bw4 = (W - 28 - 9) / 4;
+  _pdfKpiBox(doc, 14,            y, bw4, 28, 'Total equipos',      String(total),     [216,243,220]);
+  _pdfKpiBox(doc, 14+bw4+3,      y, bw4, 28, 'Procesados',         String(proc),      [216,243,220]);
+  _pdfKpiBox(doc, 14+(bw4+3)*2,  y, bw4, 28, 'Reutilizados',       String(reutiliz),  [207,226,255]);
+  _pdfKpiBox(doc, 14+(bw4+3)*3,  y, bw4, 28, 'Mat. peligrosos',    String(peligrosos),[248,215,218]);
+  y += 36;
+
+  const metas = [
+    { num:'12.4', titulo:'Gestion Ecologicamente Racional',
+      desc:`Se registraron ${peligrosos} equipo(s) con materiales peligrosos (plomo, mercurio), garantizando su disposicion conforme a marcos internacionales de gestion de residuos.`,
+      pct: Math.min(100, peligrosos > 0 ? 85 : 40) },
+    { num:'12.5', titulo:'Prevencion y Valorizacion',
+      desc:`${total} equipos gestionados en total. ${reutiliz} fueron reutilizados o donados antes de llegar al reciclaje final, extendiendo su ciclo de vida util.`,
+      pct: Math.min(100, total * 10) },
+    { num:'12.6', titulo:'Transparencia y Reportes Corporativos',
+      desc:'Informes de sostenibilidad generados automaticamente en formato PDF descargable. Datos listos para integrar en la memoria corporativa anual de la empresa.',
+      pct: 100 },
+    { num:'12.8', titulo:'Educacion y Conciencia Publica',
+      desc:'Centro educativo con 6 articulos sobre e-waste y ODS 12 disponibles para todos los colaboradores de la empresa registrada.',
+      pct: 80 },
+  ];
+
+  metas.forEach(m => {
+    if (y > 235) { doc.addPage(); _pdfHeader(doc, 'Reporte Anual ODS 12', '(continuacion)'); _pdfFooter(doc, folio); y = 64; }
+    y = _pdfSectionTitle(doc, `META ${m.num} - ${m.titulo}`, y);
+    const ls = doc.splitTextToSize(m.desc, W - 28);
+    doc.setFontSize(8.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+    doc.text(ls, 14, y); y += ls.length * 5 + 4;
+    const bW2 = W - 28;
+    doc.setFillColor(220, 220, 220); doc.roundedRect(14, y, bW2, 6, 2, 2, 'F');
+    doc.setFillColor(64, 145, 108);  doc.roundedRect(14, y, bW2 * m.pct / 100, 6, 2, 2, 'F');
+    doc.setTextColor(27, 67, 50); doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+    doc.text(`Cumplimiento: ${m.pct}%`, 14, y + 12);
+    y += 18;
+  });
+
+  if (y > 215) { doc.addPage(); _pdfHeader(doc, 'Reporte Anual ODS 12', '(continuacion)'); y = 64; }
+  y = _pdfSectionTitle(doc, 'Impacto Ambiental Acumulado', y);
+  [
+    ['Materiales recuperados estimados', `${(total*2.3).toFixed(1)} kg`],
+    ['CO2 equivalente evitado',          `${(total*15).toFixed(0)} kg`],
+    ['Agua preservada',                  `${(total*120).toFixed(0)} litros`],
+    ['Energia ahorrada',                 `${(total*45).toFixed(0)} kWh`],
+  ].forEach(([lbl, val], idx) => {
+    doc.setFillColor(idx%2===0 ? 249:255, 255, idx%2===0 ? 254:255);
+    doc.rect(14, y, W - 28, 8, 'F');
+    doc.setFontSize(8.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 60, 60);
+    doc.text(lbl, 18, y + 5.5);
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(27, 67, 50);
+    doc.text(val, W - 18, y + 5.5, { align: 'right' });
+    y += 8;
+  });
+
+  _pdfFooter(doc, folio);
+}
+
+
+async function genReport(type) {
+  if (!window.jspdf) { notify('Libreria PDF no cargada aun, intenta en un momento'); return; }
+  const { jsPDF } = window.jspdf;
+  _pdfSetBtn(type, true);
+  try {
+    const doc      = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
+    const user     = currentUser || { name:'Empresa Demo', nit:'N/A', sector:'N/A' };
+    const names    = { mensual:`Econato_Informe_Mensual_${new Date().toISOString().slice(0,7)}.pdf`, cert:`Econato_Certificado_${Date.now().toString().slice(-6)}.pdf`, anual:`Econato_Reporte_Anual_${new Date().getFullYear()}.pdf` };
+    if (type === 'mensual') _buildMensual(doc, user, inventory);
+    if (type === 'cert')    _buildCert(doc, user, inventory);
+    if (type === 'anual')   _buildAnual(doc, user, inventory);
+    doc.save(names[type]);
+    notify(`PDF descargado correctamente`);
+  } catch(err) {
+    console.error(err);
+    notify('Error generando PDF. Revisa la consola.');
+  } finally {
+    _pdfSetBtn(type, false);
+  }
+}
+
+
+window.addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+</script>
+
+</body>
+</html>
