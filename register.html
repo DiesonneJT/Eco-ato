@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrarse — Ecoñato</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="auth-wrap">
+    <div class="auth-box" style="max-width:500px">
+      <div class="logo-auth"><i class="fa fa-leaf" style="color:var(--g4)"></i> Eco<span>ñato</span></div>
+      <div class="subtitle">Crea tu cuenta empresarial</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre empresa</label>
+          <input id="reg-name" placeholder="Mi Empresa SAS">
+        </div>o
+        <div class="form-group">
+          <label>NIT</label>
+          <input id="reg-nit" placeholder="900.123.456-7">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Sector</label>
+        <select id="reg-sector">
+          <option>Tecnología</option>
+          <option>Manufactura</option>
+          <option>Comercio</option>
+          <option>Salud</option>
+          <option>Educación</option>
+          <option>Otro</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" id="reg-email" placeholder="empresa@correo.com">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="reg-pass" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label>Confirmar</label>
+          <input type="password" id="reg-pass2" placeholder="••••••••">
+        </div>
+      </div>
+
+      <button class="btn btn-acc" onclick="doRegister()">
+        <i class="fa fa-user-plus"></i> Crear cuenta
+      </button>
+
+      <div class="auth-switch">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></div>
+      <div class="auth-switch" style="margin-top:8px">
+        <a href="landing.html"><i class="fa fa-arrow-left"></i> Volver al inicio</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notificación flotante -->
+  <div class="notification" id="notif"><i class="fa fa-check-circle"></i> <span id="notif-msg"></span></div>
+
+  <script>
+    function notify(msg) {
+      const n = document.getElementById('notif');
+      document.getElementById('notif-msg').textContent = msg;
+      n.classList.add('show');
+      setTimeout(() => n.classList.remove('show'), 3000);
+    }
+
+    function doRegister() {
+      const name  = document.getElementById('reg-name').value.trim();
+      const nit   = document.getElementById('reg-nit').value.trim();
+      const sector= document.getElementById('reg-sector').value;
+      const email = document.getElementById('reg-email').value.trim();
+      const pass  = document.getElementById('reg-pass').value;
+      const pass2 = document.getElementById('reg-pass2').value;
+
+      if (!name || !email || !pass) { notify('Completa todos los campos requeridos'); return; }
+      if (pass !== pass2)           { notify('Las contraseñas no coinciden'); return; }
+
+      const users = JSON.parse(localStorage.getItem('econato_users') || '[]');
+
+      // Evitar duplicados
+      if (users.find(u => u.email === email)) { notify('Ya existe una cuenta con ese correo'); return; }
+
+      users.push({ name, nit, sector, email, pass });
+      localStorage.setItem('econato_users', JSON.stringify(users));
+
+      notify('Cuenta creada. Redirigiendo...');
+      setTimeout(() => window.location.href = 'login.html', 1500);
+    }
+
+    // Enter para registrar
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
+  </script>
+
+</body>
+</html>
