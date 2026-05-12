@@ -35,6 +35,9 @@
       <a onclick="showTab('tab-education')" id="nav-education">
         <i class="fa fa-graduation-cap"></i> Educación
       </a>
+      <a onclick="showTab('tab-guide')" id="nav-guide">
+        <i class="fa fa-circle-info"></i> Guía de uso
+      </a>
     </nav>
     <div class="s-user">
       <strong id="sidebar-name">Empresa Demo</strong>
@@ -208,6 +211,124 @@
             <div class="edu-tag">IMPACTO GLOBAL · ODS</div>
             <h4>El e-waste en cifras para 2030</h4>
             <p>Se proyectan 74 millones de toneladas de e-waste para 2030. Cada empresa que actúa hoy contribuye al cumplimiento de los ODS globales. 🌍</p>
+          </div>
+        </div>
+
+        <!-- Nuevas tarjetas -->
+        <div class="edu-card">
+          <div class="edu-img" style="background:#0077b6"></div>
+          <div class="edu-body">
+            <div class="edu-tag">META 12.2 · RECURSOS NATURALES</div>
+            <h4>Minerales críticos en la era digital</h4>
+            <p>El cobalto, el litio y las tierras raras son esenciales en baterías y chips. Su extracción genera graves impactos ambientales y sociales. Reutilizarlos es urgente. ⛏️</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#d62828"></div>
+          <div class="edu-body">
+            <div class="edu-tag">META 12.6 · RESPONSABILIDAD EMPRESARIAL</div>
+            <h4>Reporting ambiental para empresas</h4>
+            <p>El ODS 12.6 invita a las empresas a adoptar prácticas sostenibles e integrar información de sostenibilidad en sus informes. Ecoñato genera estos reportes automáticamente. 📊</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#606c38"></div>
+          <div class="edu-body">
+            <div class="edu-tag">META 12.1 · MARCO DECENAL</div>
+            <h4>El Marco de Consumo Sostenible de la ONU</h4>
+            <p>Desde 2012, el Programa de las Naciones Unidas apoya políticas nacionales para desacoplar el crecimiento económico del deterioro ambiental. Colombia hace parte de este marco. 🌐</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#bc6c25"></div>
+          <div class="edu-body">
+            <div class="edu-tag">CICLO DE VIDA · DISEÑO</div>
+            <h4>Diseño para la durabilidad</h4>
+            <p>Un producto diseñado para durar y repararse genera hasta 70% menos residuos que uno desechable. La reparabilidad es el nuevo estándar en Europa y América Latina. 🔧</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#3d405b"></div>
+          <div class="edu-body">
+            <div class="edu-tag">SALUD · COMUNIDADES</div>
+            <h4>E-waste informal y salud pública</h4>
+            <p>El desmantelamiento informal de equipos expone a trabajadores a metales pesados. Registrar y canalizar tus equipos protege a las personas más vulnerables. 🏥</p>
+          </div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-img" style="background:#40916c"></div>
+          <div class="edu-body">
+            <div class="edu-tag">CERTIFICACIÓN · IMPACTO REAL</div>
+            <h4>¿Qué significa un certificado de disposición?</h4>
+            <p>Un certificado de disposición responsable acredita que tus equipos fueron entregados a un gestor autorizado. Es tu respaldo legal y tu aporte medible al ODS 12. 📜</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="edu-banner">
+        <i class="fa fa-leaf"></i>
+        <span>El ODS 12 no es solo una meta global — es una decisión que tu empresa toma cada vez que registra un equipo. <strong>Cada acción cuenta.</strong></span>
+      </div>
+    </div>
+
+    <!-- PESTAÑA: GUÍA DE USO -->
+    <div id="tab-guide" style="display:none">
+      <div class="top-bar"><h1>Guía de uso</h1></div>
+
+      <div class="guide-intro">
+        Ecoñato es una plataforma de gestión de residuos electrónicos (RAEE) para empresas. Aquí encontrarás cómo aprovechar cada sección y qué muestra cada gráfico.
+      </div>
+
+      <div class="guide-grid">
+        <div class="guide-block">
+          <div class="guide-icon" style="background:var(--g3)"><i class="fa fa-gauge-high"></i></div>
+          <div class="guide-content">
+            <h4>Dashboard</h4>
+            <p>Resumen ejecutivo de tu inventario: equipos totales, kg estimados recuperados, CO₂ evitado y litros de agua ahorrados. Se actualiza al registrar o procesar un equipo.</p>
+            <div class="guide-chips">
+              <span class="guide-chip">🍩 Dona · Estados del inventario</span>
+              <span class="guide-chip">📈 Línea · Tendencia mensual</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-block">
+          <div class="guide-icon" style="background:#f77f00"><i class="fa fa-boxes-stacked"></i></div>
+          <div class="guide-content">
+            <h4>Inventario</h4>
+            <p>Registra, edita y elimina tus equipos. Filtra por estado y marca como "Procesado" los que ya fueron gestionados. Los equipos con materiales peligrosos muestran alerta ⚠️.</p>
+            <div class="guide-chips">
+              <span class="guide-chip">➕ Registrar equipo</span>
+              <span class="guide-chip">✏️ Editar / Eliminar</span>
+              <span class="guide-chip">✅ Marcar procesado</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-block">
+          <div class="guide-icon" style="background:#457b9d"><i class="fa fa-chart-bar"></i></div>
+          <div class="guide-content">
+            <h4>Estadísticas</h4>
+            <p>Cuatro gráficos interactivos (Chart.js) para analizar tu inventario en profundidad:</p>
+            <div class="guide-chips">
+              <span class="guide-chip">📊 Barras · Equipos por tipo</span>
+              <span class="guide-chip">🍩 Dona · Distribución de estados</span>
+              <span class="guide-chip">📈 Línea · Registros por mes</span>
+              <span class="guide-chip">⚗️ Barras · Frecuencia de materiales</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-block">
+          <div class="guide-icon" style="background:#6a4c93"><i class="fa fa-file-lines"></i></div>
+          <div class="guide-content">
+            <h4>Reportes y Certificados</h4>
+            <p>Genera documentos PDF descargables con un clic:</p>
+            <div class="guide-chips">
+              <span class="guide-chip">📋 Reporte mensual</span>
+              <span class="guide-chip">📅 Reporte anual ODS 12</span>
+              <span class="guide-chip">📜 Certificado de disposición</span>
+            </div>
           </div>
         </div>
       </div>

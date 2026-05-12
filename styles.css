@@ -365,3 +365,101 @@ tr:hover td { background: #f9fffe; }
   .hero h1 { font-size: 2rem; }
   nav.top .nav-links { display: none; }
 }
+
+/* ===== EDUCACIÓN AMPLIADA ===== */
+.edu-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--g2);
+  letter-spacing: .5px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.edu-intro {
+  background: var(--white);
+  border-left: 4px solid var(--g3);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-size: .92rem;
+  color: #444;
+  line-height: 1.7;
+  box-shadow: var(--shadow);
+}
+.edu-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, var(--g2), var(--g4));
+  color: var(--white);
+  border-radius: var(--radius);
+  padding: 18px 24px;
+  margin-top: 28px;
+  font-size: .92rem;
+  line-height: 1.6;
+}
+.edu-banner i { font-size: 1.8rem; flex-shrink: 0; }
+
+/* ===== GUÍA DE USO ===== */
+.guide-intro {
+  background: var(--white);
+  border-left: 4px solid var(--acc);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  font-size: .92rem;
+  color: #444;
+  line-height: 1.7;
+  box-shadow: var(--shadow);
+}
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+.guide-block {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+}
+.guide-icon {
+  width: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 22px;
+  color: var(--white);
+  font-size: 1.25rem;
+}
+.guide-content {
+  padding: 18px 18px 18px 12px;
+  flex: 1;
+}
+.guide-content h4 {
+  color: var(--g1);
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+.guide-content p {
+  font-size: .87rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.guide-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.guide-chip {
+  background: var(--g6);
+  color: var(--g2);
+  font-size: .75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
